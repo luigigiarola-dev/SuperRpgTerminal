@@ -130,7 +130,6 @@ public final class Aplicativo extends Application {
             case "Mapa" -> mapa(s);
             case "Mochila" -> inventario(s);
             case "Missões" -> opcoes("O diário da sua jornada", "Aceite e entregue missões ao visitar a vila.",s.missoes(),MISSAO);
-            case "Mercador" -> opcoes("O estoque de Tobias",s.periodo().equals("Noite")||s.periodo().equals("Madrugada")?"O mercado está fechado. Descanse até a manhã.":"Suprimentos e equipamentos. Sua honra influencia os preços.",s.loja(),COMPRAR);
             case "Serviços" -> servicos(s);
             default -> jornada(s);
         };
@@ -145,7 +144,7 @@ public final class Aplicativo extends Application {
         VBox v=new VBox(8);v.getStyleClass().add("sidebar");v.setPrefWidth(208);v.setPadding(new Insets(24,18,18,18));
         v.getChildren().addAll(texto("SUPER RPG","brand"),texto("CRÔNICAS DE AURORA","tiny"),new Separator());
         boolean combate=s.fase()==EstadoJogo.Fase.COMBATE;
-        for(String p:List.of("Jornada","Mapa","Mochila","Missões","Mercador","Serviços")) {
+        for(String p:List.of("Jornada","Mapa","Mochila","Missões","Serviços")) {
             Button b=botao(p,p.equals(pagina)?"nav-active":"nav",()->{pagina=p;renderizar();});
             b.setDisable(s.talentos()>0 || (s.fase()!=EstadoJogo.Fase.EXPLORACAO && !(combate && p.equals("Mochila")) && !p.equals("Jornada")) || (p.equals("Mercador")||p.equals("Serviços"))&&!s.localId().equals("VILA"));
             v.getChildren().add(b);
@@ -219,6 +218,9 @@ public final class Aplicativo extends Application {
         VBox.setVgrow(v.getChildren().getLast(),Priority.ALWAYS);return v;
     }
     private Node opcoes(String titulo,String subtitulo,List<EstadoJogo.Opcao> lista,AcaoJogo.Tipo tipo) {
+        return opcoes(titulo,subtitulo,lista,tipo,true);
+    }
+    private Node opcoes(String titulo,String subtitulo,List<EstadoJogo.Opcao> lista,AcaoJogo.Tipo tipo,boolean rolagem) {
         VBox v=coluna(texto(titulo,"card-title"),texto(subtitulo,"muted"));
         VBox itens=new VBox(10);
         if(lista.isEmpty())itens.getChildren().add(texto("Nada por aqui ainda.","intro"));
@@ -240,19 +242,23 @@ public final class Aplicativo extends Application {
             b.setDisable(!o.disponivel());b.setMinWidth(104);
             HBox card=linha(descricao,b);card.getStyleClass().add("item-card");itens.getChildren().add(card);
         }
+        if(!rolagem){v.getChildren().add(itens);v.setMinHeight(Region.USE_PREF_SIZE);return v;}
         ScrollPane scroll=new ScrollPane(itens);scroll.setFitToWidth(true);VBox.setVgrow(scroll,Priority.ALWAYS);v.getChildren().add(scroll);return v;
+    }
+    private Node secoes(Node... secoes) {
+        VBox conteudo=new VBox(22,secoes);conteudo.setPadding(new Insets(0,8,12,0));
+        ScrollPane scroll=new ScrollPane(conteudo);scroll.setFitToWidth(true);return scroll;
     }
     private Node servicos(EstadoJogo s) {
         var vila=s.vila();
-        TabPane abas=new TabPane();abas.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        VBox templo=coluna(opcoes("Bênção", "O templo acolhe a todos, a qualquer hora.",vila.cura(),CURAR),
-                opcoes("Generosidade", "A doação não recebe desconto por honra.",vila.doacao(),DOAR));
-        templo.getChildren().forEach(n->VBox.setVgrow(n,Priority.ALWAYS));
-        VBox taverna=coluna(opcoes("Repouso", "Um teto para recuperar as forças.",vila.descanso(),DESCANSAR),
-                opcoes("Companhia", "Aliado atual: "+vila.aliadoAtual(),vila.aliados(),CONTRATAR),
-                opcoes("Seguir sozinho", "A dispensa não devolve o ouro da contratação.",vila.dispensa(),DISPENSAR));
-        taverna.getChildren().forEach(n->VBox.setVgrow(n,Priority.ALWAYS));
-        abas.getTabs().addAll(new Tab("Venda",opcoes("Negociar com Tobias","Apenas itens da mochila. Itens de missão não podem ser vendidos.",vila.vendas(),VENDER)),
+        TabPane abas=new TabPane();abas.setMinHeight(0);abas.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        Node templo=secoes(opcoes("Bênção", "O templo acolhe a todos, a qualquer hora.",vila.cura(),CURAR,false),
+                opcoes("Generosidade", "A doação não recebe desconto por honra.",vila.doacao(),DOAR,false));
+        Node taverna=secoes(opcoes("Repouso", "Um teto para recuperar as forças.",vila.descanso(),DESCANSAR,false),
+                opcoes("Companhia", "Aliado atual: "+vila.aliadoAtual(),vila.aliados(),CONTRATAR,false),
+                opcoes("Seguir sozinho", "A dispensa não devolve o ouro da contratação.",vila.dispensa(),DISPENSAR,false));
+        abas.getTabs().addAll(new Tab("Compra",opcoes("O estoque de Tobias",s.periodo().equals("Noite")||s.periodo().equals("Madrugada")?"O mercado está fechado. Descanse até a manhã.":"Suprimentos e equipamentos. Sua honra influencia os preços.",s.loja(),COMPRAR)),
+                new Tab("Venda",opcoes("Negociar com Tobias","Apenas itens da mochila. Itens de missão não podem ser vendidos.",vila.vendas(),VENDER)),
                 new Tab("Forja",opcoes("A forja de Borin","Melhore a arma ou armadura equipada até +5.",vila.forja(),MELHORAR)),
                 new Tab("Alquimia",opcoes("O laboratório de Mara","Os ingredientes são consumidos somente quando a receita está completa.",vila.receitas(),CRIAR)),
                 new Tab("Templo",templo),new Tab("Taverna",taverna));
@@ -337,12 +343,13 @@ public final class Aplicativo extends Application {
             ()->{snapshot("01-titulo");clicar("NOVA JORNADA   →");},
             ()->{snapshot("02-criacao");((TextField)raiz.lookup(".text-field")).setText("Arthur");clicar("ENTRAR EM AURORA   →");},
             ()->{snapshot("03-vila");clicar("Serviços");},
-            ()->{snapshot("08-venda");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(1);},
-            ()->{snapshot("09-forja");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(2);},
-            ()->{snapshot("10-alquimia");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(3);},
+            ()->{snapshot("14-compra");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(1);},
+            ()->{snapshot("08-venda");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(2);},
+            ()->{snapshot("09-forja");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(3);},
+            ()->{snapshot("10-alquimia");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(4);},
             ()->{snapshot("11-templo");clicar("Receber cura");
                 if(jogo.estado().ouro()!=50)throw new IllegalStateException("Cura não foi debitada corretamente.");
-                ((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(4);},
+                ((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(5);},
             ()->{snapshot("12-taverna");janela.setWidth(1024);janela.setHeight(720);},
             ()->{snapshot("13-taverna-compacta");clicar("Jornada");clicar("EXPLORAR O MAPA   →");},
             ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));if(jogo.estado().fase()==EstadoJogo.Fase.EXPLORACAO)clicar("PROCURAR UM CONFRONTO");},

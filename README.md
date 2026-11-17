@@ -3,7 +3,7 @@
 ## Versões
 
 - **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
-- **v2.0.0-alpha.1:** primeira prévia gráfica em JavaFX. A branch `main` reúne o desenvolvimento
+- **v2.0.0-alpha.2:** prévia gráfica em JavaFX com os serviços da vila. A branch `main` reúne o desenvolvimento
   atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
@@ -22,14 +22,23 @@ Já disponíveis na interface:
 - Combate por agilidade, habilidades, mana, recargas, status, defesa, análise e fuga.
 - Chefes, interrupção de golpes carregados, recompensas e escolha de talentos.
 - Inventário, equipamentos, compra de suprimentos, missões e descanso na taverna.
+- Serviços da vila em abas: venda, forja, alquimia, templo e contratação/dispensa de aliados.
+- Custos, chances da forja e ingredientes faltantes visíveis, com confirmação de ações relevantes.
 - Histórico de eventos, números flutuantes de dano/cura e opção de animações rápidas.
 - Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato interno 2
   do save legado. Esse número pertence ao formato do arquivo e não à versão pública do jogo.
 
-Ainda pendentes: eventos narrativos de exploração, venda, forja, alquimia, contratação de aliados,
-templo, dados, charadas, ranking gráfico, áudio, animações completas e instaladores com Java embutido.
+Ainda pendentes: eventos narrativos de exploração, dados, charadas, ranking gráfico, áudio,
+animações completas e instaladores com Java embutido.
 **Na prévia gráfica, procurar um confronto inicia um combate; a seleção aleatória de eventos da
 exploração original ainda será migrada.** Aliados importados de saves v2 já agem em combate.
+
+Na vila, abra **Serviços** no menu lateral. Venda, forja e alquimia fecham à noite;
+templo e taverna funcionam em todos os períodos. A forja só melhora arma e armadura
+equipadas, até +5, e cobra a tentativa mesmo se falhar. A alquimia é gratuita e exige
+todos os ingredientes. A contratação substitui o aliado atual sem reembolso.
+Preços e regras seguem o terminal, incluindo a venda de equipamento melhorado pelo
+valor-base de revenda e a doação fixa de 50 ouro, com honra limitada a +5.
 
 ### Executar a interface
 

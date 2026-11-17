@@ -7,7 +7,13 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
-## Em desenvolvimento
+## [2.0.0-alpha.2] — 2026-11-17
+
+- Serviços da vila na interface: venda, forja, alquimia, cura, doação, contratação e dispensa de aliados.
+- Custos, horários, chances e ingredientes faltantes exibidos antes das ações; confirmação para
+  venda, forja, doação, contratação e dispensa.
+- 15 novos testes para regras da vila e persistência, totalizando 41 testes.
+- Roteiro gráfico ampliado para visitar as seis abas, realizar uma cura e testar a taverna compacta.
 
 - Automação no GitHub para testes de regras, persistência e execução da distribuição
   gráfica em Windows, macOS e Linux, com Java 21 e 26.
@@ -48,4 +54,5 @@ Versão original completa do RPG executada no terminal.
 - Arte ASCII e cores ANSI em um único arquivo Java, sem dependências externas.
 
 [2.0.0-alpha.1]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v2.0.0-alpha.1
+[2.0.0-alpha.2]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v2.0.0-alpha.2
 [1.0.0]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v1.0.0

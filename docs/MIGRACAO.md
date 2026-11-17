@@ -5,6 +5,8 @@
 A versão original do terminal é `v1.0.0`. Esta primeira entrega gráfica é
 `v2.0.0-alpha.1`: o salto de versão representa a nova interface e a nova estrutura do projeto;
 o sufixo `alpha.1` deixa explícito que a migração ainda não está completa.
+A entrega atual, `v2.0.0-alpha.2`, completa os serviços da vila e acrescenta validação
+automatizada em Windows, macOS e Linux com Java 21 e 26.
 
 As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
 incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
@@ -43,21 +45,22 @@ paridade de todos os sistemas nem acabamento artístico final.
 - [x] Interface de inventário, equipamentos, diário e compra de itens.
 - [x] Save/load JSON e importação v2.
 - [x] Cenários/avatares originais em código e teste visual em duas dimensões de janela.
+- [x] Venda, forja, alquimia, templo e contratação/dispensa de aliados na interface.
+- [x] Testes e roteiro gráfico automatizados nos três sistemas de destino.
 - [ ] Paridade completa com o terminal.
 - [ ] Arte final, áudio, efeitos avançados e instaladores independentes de Java.
 
 ## Próximas entregas, em ordem
 
-1. Completar a vila: venda, forja, alquimia, templo e contratação de aliados.
-2. Migrar todos os eventos de exploração, dados, charadas, rumores e diálogos de NPCs.
-3. Completar as pausas entre andares da torre e permitir gestão de itens/retirada como no terminal.
-4. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
-5. Extrair regras ainda repetidas entre a orquestração do console e a gráfica, substituir a ponte
+1. Migrar todos os eventos de exploração, dados, charadas, rumores e diálogos de NPCs.
+2. Completar as pausas entre andares da torre e permitir gestão de itens/retirada como no terminal.
+3. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
+4. Extrair regras ainda repetidas entre a orquestração do console e a gráfica, substituir a ponte
    de mensagens por eventos estruturados adicionais, injetar RNG e dividir os serviços por domínio.
-6. Refinar personagens, cenários e animações: movimento de ataque, projéteis, crítico, impacto,
+5. Refinar personagens, cenários e animações: movimento de ataque, projéteis, crítico, impacto,
    barras animadas, morte, level up e sinalização de turnos. Adicionar áudio com licenças registradas.
-7. Ranking, opções persistentes, acessibilidade e validação Windows/Linux.
-8. Empacotar com runtime Java usando `jpackage`; documentar assinatura e distribuição por plataforma.
+6. Ranking, opções persistentes, acessibilidade e conferência manual Windows/Linux.
+7. Empacotar com runtime Java usando `jpackage`; documentar assinatura e distribuição por plataforma.
 
 ## Regras preservadas e diferenças explícitas
 
