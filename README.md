@@ -2,16 +2,16 @@
 
 ## Versões
 
-- **v1.0.0:** aventura original completa no terminal, preservada na branch `main`.
-- **v2.0.0-alpha.1:** primeira prévia gráfica em JavaFX, disponível na branch
-  `codex/interface-javafx`. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
+- **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
+- **v2.0.0-alpha.1:** primeira prévia gráfica em JavaFX. A branch `main` reúne o desenvolvimento
+  atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
 [versões publicadas no GitHub](https://github.com/luigigiarola-dev/SuperRpgTerminal/releases).
 
 ## Interface gráfica — primeira etapa da migração
 
-A branch `codex/interface-javafx` acrescenta uma versão desktop em **JavaFX**, com tema de fantasia,
+A versão desktop usa **JavaFX**, com tema de fantasia,
 cenários e personagens desenhados em Canvas. É uma primeira versão jogável, ainda em desenvolvimento;
 ela **não substitui todos os recursos do terminal** nesta etapa.
 
