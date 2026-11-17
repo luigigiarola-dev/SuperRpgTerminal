@@ -1,5 +1,102 @@
 # ⚔️ SuperRpgTerminal
 
+## Interface gráfica — primeira etapa da migração
+
+A branch `codex/interface-javafx` acrescenta uma versão desktop em **JavaFX**, com tema de fantasia,
+cenários e personagens desenhados em Canvas. É uma primeira versão jogável, ainda em desenvolvimento;
+ela **não substitui todos os recursos do terminal** nesta etapa.
+
+Já disponíveis na interface:
+
+- Menu inicial, criação das cinco classes e modo Normal/Hardcore.
+- Vila, mapa com destinos bloqueados, viagens, coleta e acampamento.
+- Combate por agilidade, habilidades, mana, recargas, status, defesa, análise e fuga.
+- Chefes, interrupção de golpes carregados, recompensas e escolha de talentos.
+- Inventário, equipamentos, compra de suprimentos, missões e descanso na taverna.
+- Histórico de eventos, números flutuantes de dano/cura e opção de animações rápidas.
+- Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato v2.
+
+Ainda pendentes: eventos narrativos de exploração, venda, forja, alquimia, contratação de aliados,
+templo, dados, charadas, ranking gráfico, áudio, animações completas e instaladores com Java embutido.
+**Na prévia gráfica, procurar um confronto inicia um combate; a seleção aleatória de eventos da
+exploração original ainda será migrada.** Aliados importados de saves v2 já agem em combate.
+
+### Executar a interface
+
+Requer **JDK 21 a 26**. Não é necessário instalar Gradle nem JavaFX manualmente.
+Na primeira execução, o Gradle Wrapper baixa as dependências; é necessário acesso à internet.
+
+```bash
+./gradlew run
+```
+
+No Windows:
+
+```powershell
+.\gradlew.bat run
+```
+
+Atalhos: `1` atacar, `2` habilidades, `3` defender e `F11` tela cheia.
+A janela é redimensionável, com mínimo de 1024 × 720. Salve fora dos combates,
+depois de escolher talentos e confirmar as recompensas. O botão **Continuar jornada**
+fica disponível quando existe um save gráfico.
+
+Local do save `jornada.json`:
+
+- macOS: `~/Library/Application Support/SuperRpgTerminal/`.
+- Windows: `%APPDATA%/SuperRpgTerminal/`.
+- Linux: `$XDG_DATA_HOME/SuperRpgTerminal/`, ou `~/.local/share/SuperRpgTerminal/`.
+
+O save anterior fica em `jornada.anterior.json`. A importação não modifica o save do terminal.
+O formato JSON é unidirecional: a versão antiga de terminal não lê o novo save.
+O marcador diário da charada do v2 não é usado na prévia gráfica, que ainda não contém esse minijogo.
+
+### Testes e distribuição
+
+```bash
+./gradlew test
+./gradlew run --args=--smoke
+./gradlew installDist
+```
+
+O teste visual abre a janela, aciona botões e salva capturas em `build/screenshots/`.
+Ele requer uma sessão gráfica e não altera saves do usuário. Os testes unitários usam pastas temporárias.
+A distribuição fica em `build/install/super-rpg/`, com iniciadores em `bin/`.
+Ela inclui as bibliotecas, mas ainda requer Java instalado. Gere a distribuição no sistema/arquitetura
+de destino: os componentes nativos de JavaFX são específicos da plataforma.
+
+Validação inicial realizada em macOS Apple Silicon. Windows e Linux ainda precisam de validação visual.
+O Gradle está fixado em 9.4.0 com checksum oficial; o código é compilado com compatibilidade Java 21.
+
+### Organização da migração
+
+```text
+src/main/java/br/com/superrpg/
+  jogo/    entidades extraídas, motor, ações, eventos, snapshots e persistência
+  ui/      aplicação JavaFX, composição das telas e desenho dos cenários
+src/main/resources/tema.css
+src/test/java/br/com/superrpg/jogo/
+docs/MIGRACAO.md
+```
+
+O pacote `jogo` mantém inicialmente as entidades juntas para preservar seu encapsulamento durante a
+extração. A UI acessa `MotorJogo`, envia `AcaoJogo` e recebe `EstadoJogo` imutável e `EventoJogo`.
+As entidades compartilhadas não leem teclado para escolher talentos. O console é responsável por
+perguntar e enviar a escolha; a UI usa botões. A divisão adicional em domínio/serviços virá depois da paridade.
+
+O arquivo da raiz `SuperRpgTerminal.java` permanece como referência intacta da versão original,
+e continua funcionando com os comandos abaixo. O console usando as classes extraídas pode ser executado com:
+
+```bash
+./gradlew --console=plain console
+```
+
+Veja o [plano e as limitações da migração](docs/MIGRACAO.md) e a [origem dos recursos visuais](docs/RECURSOS.md).
+
+---
+
+## Versão original de terminal
+
 Um RPG de aventura em **Java puro**, jogado inteiramente no terminal. Escolha uma classe, explore o reino, cumpra missões, lute com monstros e chefes em combate por turnos e enfrente o dragão Ignis.
 
 Tudo em um único arquivo (`SuperRpgTerminal.java`), sem dependências externas.
