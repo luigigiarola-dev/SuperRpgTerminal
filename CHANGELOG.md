@@ -7,6 +7,12 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## Em desenvolvimento
+
+- Automação no GitHub para testes de regras, persistência e execução da distribuição
+  gráfica em Windows, macOS e Linux, com Java 21 e 26.
+- Relatórios e capturas de tela por ambiente, com roteiro de conferência manual documentado.
+
 ## [2.0.0-alpha.1] — 2026-11-17
 
 Primeira prévia pública da migração para uma interface gráfica em JavaFX.

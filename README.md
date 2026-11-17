@@ -50,8 +50,9 @@ que contém `gradlew.bat`. Instale um JDK 21 a 26 **x64**, disponível no `PATH`
 
 O projeto deve funcionar em Windows, macOS e Linux. A configuração atual usa JavaFX
 para Windows x64; Windows ARM com Java ARM nativo ainda não é suportado por essa configuração.
-Até esta prévia, a execução gráfica foi validada apenas no macOS Apple Silicon.
-A validação em uma máquina Windows é requisito para a versão estável `2.0.0`.
+Na release `2.0.0-alpha.1`, a execução gráfica havia sido validada apenas no macOS Apple Silicon.
+O desenvolvimento atual acrescenta validação automatizada nos três sistemas. A conferência
+manual em um computador Windows 10/11 é requisito para a versão estável `2.0.0`.
 
 Atalhos: `1` atacar, `2` habilidades, `3` defender e `F11` tela cheia.
 A janela é redimensionável, com mínimo de 1024 × 720. Salve fora dos combates,
@@ -71,6 +72,11 @@ contém esse minijogo.
 
 ### Testes e distribuição
 
+O GitHub executa testes de regras, persistência e um roteiro gráfico em Windows, macOS
+e Linux, com Java 21 e 26. Consulte os resultados na aba
+[Actions](https://github.com/luigigiarola-dev/SuperRpgTerminal/actions/workflows/validacao.yml)
+e o [escopo da validação](docs/VALIDACAO.md). Cada execução guarda relatórios e capturas de tela.
+
 ```bash
 ./gradlew test
 ./gradlew run --args=--smoke
@@ -88,7 +94,8 @@ Depois, execute `.\build\install\super-rpg\bin\super-rpg.bat`.
 Uma distribuição gerada no Mac não deve ser copiada para executar no Windows;
 gere-a no próprio Windows. Esta prévia não inclui instalador `.exe` nem Java embutido.
 
-Validação inicial realizada em macOS Apple Silicon. Windows e Linux ainda precisam de validação visual.
+Validação inicial realizada em macOS Apple Silicon; o roteiro gráfico também executa nos
+ambientes Windows e Linux do GitHub. A conferência manual completa continua pendente.
 O Gradle está fixado em 9.4.0 com checksum oficial; o código é compilado com compatibilidade Java 21.
 
 ### Organização da migração
