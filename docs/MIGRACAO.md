@@ -1,5 +1,15 @@
 # Migração para JavaFX
 
+## Versão desta entrega
+
+A versão original do terminal é `v1.0.0`. Esta primeira entrega gráfica é
+`v2.0.0-alpha.1`: o salto de versão representa a nova interface e a nova estrutura do projeto;
+o sufixo `alpha.1` deixa explícito que a migração ainda não está completa.
+
+As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
+incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
+estar pronta. Alterações relevantes são registradas em `CHANGELOG.md`.
+
 ## Objetivo
 
 Entregar um RPG desktop com identidade visual de fantasia, preservando as regras da versão terminal.
@@ -20,7 +30,8 @@ paridade de todos os sistemas nem acabamento artístico final.
   de partidas inteiras, a próxima etapa deve injetar uma fonte de aleatoriedade em todo o domínio.
 - O arquivo monolítico original permanece congelado para referência. Mudanças futuras devem entrar em `src/`.
 - Saves gráficos versionados e escrita por substituição atômica quando o sistema oferece suporte,
-  com uma cópia anterior. Importação v2 sem alterar o arquivo de origem.
+  com uma cópia anterior. Importação do formato interno 2 do save legado sem alterar o arquivo
+  de origem; essa numeração do arquivo é independente da versão pública do jogo.
 
 ## Entrega inicial
 

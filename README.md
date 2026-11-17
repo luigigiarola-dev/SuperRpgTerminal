@@ -1,5 +1,14 @@
 # ⚔️ SuperRpgTerminal
 
+## Versões
+
+- **v1.0.0:** aventura original completa no terminal, preservada na branch `main`.
+- **v2.0.0-alpha.1:** primeira prévia gráfica em JavaFX, disponível na branch
+  `codex/interface-javafx`. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
+
+Consulte o [histórico de versões](CHANGELOG.md) e as
+[versões publicadas no GitHub](https://github.com/luigigiarola-dev/SuperRpgTerminal/releases).
+
 ## Interface gráfica — primeira etapa da migração
 
 A branch `codex/interface-javafx` acrescenta uma versão desktop em **JavaFX**, com tema de fantasia,
@@ -14,7 +23,8 @@ Já disponíveis na interface:
 - Chefes, interrupção de golpes carregados, recompensas e escolha de talentos.
 - Inventário, equipamentos, compra de suprimentos, missões e descanso na taverna.
 - Histórico de eventos, números flutuantes de dano/cura e opção de animações rápidas.
-- Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato v2.
+- Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato interno 2
+  do save legado. Esse número pertence ao formato do arquivo e não à versão pública do jogo.
 
 Ainda pendentes: eventos narrativos de exploração, venda, forja, alquimia, contratação de aliados,
 templo, dados, charadas, ranking gráfico, áudio, animações completas e instaladores com Java embutido.
@@ -49,7 +59,8 @@ Local do save `jornada.json`:
 
 O save anterior fica em `jornada.anterior.json`. A importação não modifica o save do terminal.
 O formato JSON é unidirecional: a versão antiga de terminal não lê o novo save.
-O marcador diário da charada do v2 não é usado na prévia gráfica, que ainda não contém esse minijogo.
+O marcador diário da charada do formato legado 2 não é usado na prévia gráfica, que ainda não
+contém esse minijogo.
 
 ### Testes e distribuição
 

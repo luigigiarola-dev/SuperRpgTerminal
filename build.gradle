@@ -2,6 +2,9 @@ plugins {
     id 'application'
 }
 
+group = 'br.com.superrpg'
+version = '2.0.0-alpha.1'
+
 repositories { mavenCentral() }
 
 def os = System.getProperty('os.name').toLowerCase()
