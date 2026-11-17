@@ -1,0 +1,66 @@
+name: Validação multiplataforma
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validacao-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    name: ${{ matrix.os }} / Java ${{ matrix.java }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-15]
+        java: ['21', '26']
+    steps:
+      - name: Obter código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Preparar Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - name: Preparar ambiente gráfico Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgtk-3-0
+      - name: Testar e gerar distribuição (Windows)
+        if: runner.os == 'Windows'
+        run: .\gradlew.bat --no-daemon test installDist
+      - name: Testar e gerar distribuição (macOS/Linux)
+        if: runner.os != 'Windows'
+        run: ./gradlew --no-daemon test installDist
+      - name: Executar distribuição e roteiro gráfico (Windows)
+        if: runner.os == 'Windows'
+        run: .\build\install\super-rpg\bin\super-rpg.bat --smoke
+      - name: Executar distribuição e roteiro gráfico (macOS)
+        if: runner.os == 'macOS'
+        run: ./build/install/super-rpg/bin/super-rpg --smoke
+      - name: Executar distribuição e roteiro gráfico (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s '-screen 0 1440x1000x24' ./build/install/super-rpg/bin/super-rpg --smoke
+      - name: Confirmar conclusão do roteiro gráfico
+        shell: bash
+        run: test -s build/screenshots/07-compacto.png
+      - name: Guardar relatórios e capturas
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validacao-${{ matrix.os }}-java-${{ matrix.java }}
+          path: |
+            build/reports/tests/test/
+            build/test-results/test/
+            build/screenshots/
+          retention-days: 14
+          if-no-files-found: warn
