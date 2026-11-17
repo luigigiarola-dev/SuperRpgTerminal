@@ -1,0 +1,43 @@
+plugins {
+    id 'application'
+}
+
+group = 'br.com.superrpg'
+version = '2.0.0-alpha.1'
+
+repositories { mavenCentral() }
+
+def os = System.getProperty('os.name').toLowerCase()
+def arm = System.getProperty('os.arch') in ['aarch64', 'arm64']
+def platform = os.contains('mac') ? (arm ? 'mac-aarch64' : 'mac') : os.contains('win') ? 'win' : (arm ? 'linux-aarch64' : 'linux')
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.11.0'
+    ['base', 'graphics', 'controls'].each { module ->
+        implementation "org.openjfx:javafx-${module}:21.0.9:${platform}"
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+application {
+    mainModule = 'br.com.superrpg'
+    mainClass = 'br.com.superrpg.ui.Iniciar'
+    applicationDefaultJvmArgs = ['--enable-native-access=javafx.graphics']
+}
+test { useJUnitPlatform() }
+tasks.register('console', JavaExec) {
+    group = 'application'
+    description = 'Executa a versão de terminal migrada.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'br.com.superrpg.jogo.SuperRpgTerminal'
+    standardInput = System.in
+}

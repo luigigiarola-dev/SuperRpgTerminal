@@ -1,4 +1,6 @@
 # Java compilado
+.gradle/
+build/
 *.class
 out/
 bin/
