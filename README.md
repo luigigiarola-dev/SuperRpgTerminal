@@ -40,11 +40,18 @@ Na primeira execução, o Gradle Wrapper baixa as dependências; é necessário 
 ./gradlew run
 ```
 
-No Windows:
+No **Windows x64**, extraia o código da release gráfica e abra o PowerShell na pasta
+que contém `gradlew.bat`. Instale um JDK 21 a 26 **x64**, disponível no `PATH`
+(confira com `java -version`), e execute:
 
 ```powershell
 .\gradlew.bat run
 ```
+
+O projeto deve funcionar em Windows, macOS e Linux. A configuração atual usa JavaFX
+para Windows x64; Windows ARM com Java ARM nativo ainda não é suportado por essa configuração.
+Até esta prévia, a execução gráfica foi validada apenas no macOS Apple Silicon.
+A validação em uma máquina Windows é requisito para a versão estável `2.0.0`.
 
 Atalhos: `1` atacar, `2` habilidades, `3` defender e `F11` tela cheia.
 A janela é redimensionável, com mínimo de 1024 × 720. Salve fora dos combates,
@@ -75,6 +82,11 @@ Ele requer uma sessão gráfica e não altera saves do usuário. Os testes unit�
 A distribuição fica em `build/install/super-rpg/`, com iniciadores em `bin/`.
 Ela inclui as bibliotecas, mas ainda requer Java instalado. Gere a distribuição no sistema/arquitetura
 de destino: os componentes nativos de JavaFX são específicos da plataforma.
+
+No Windows, use `.\gradlew.bat test` e `.\gradlew.bat installDist` na pasta do projeto.
+Depois, execute `.\build\install\super-rpg\bin\super-rpg.bat`.
+Uma distribuição gerada no Mac não deve ser copiada para executar no Windows;
+gere-a no próprio Windows. Esta prévia não inclui instalador `.exe` nem Java embutido.
 
 Validação inicial realizada em macOS Apple Silicon. Windows e Linux ainda precisam de validação visual.
 O Gradle está fixado em 9.4.0 com checksum oficial; o código é compilado com compatibilidade Java 21.

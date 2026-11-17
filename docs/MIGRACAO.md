@@ -79,6 +79,12 @@ não fizer parte da UI. Nenhuma alegação de balanceamento humano foi feita nes
 
 ## Verificação
 
+Windows x64 é uma plataforma de destino obrigatória. A versão estável `2.0.0` exige
+validar nesse sistema a inicialização, criação de personagem, combate, redimensionamento,
+salvamento/carregamento e a distribuição gerada por `gradlew.bat installDist`.
+O build atual seleciona os componentes nativos JavaFX `win` (x64); Windows ARM nativo
+precisa de uma configuração específica e não faz parte desta prévia.
+
 `./gradlew test` verifica regras e persistência. `./gradlew run --args=--smoke` abre a interface,
 aciona criação, entrada na vila, mapa e ataque, e registra capturas para inspeção visual.
 O modo smoke não deve ser usado como substituto para jogar uma campanha completa.
