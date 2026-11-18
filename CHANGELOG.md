@@ -7,6 +7,15 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## [2.0.0-alpha.4] — 2026-11-18
+
+- Conversas com Mira, Lira, Borin, Aldric e Gus, preservando as falas do terminal.
+- Missões filtradas por morador, aceitação/entrega explícita, pré-requisitos e recompensa única.
+- Pausa entre os dois primeiros andares da torre: usar itens, equipar, continuar ou descer.
+- Retirada/fuga/derrota reiniciam a subida; recompensas já obtidas são mantidas na retirada.
+- Save continua no formato 4; é necessário terminar ou abandonar a subida antes de salvar.
+- 12 novos testes, totalizando 81, e roteiro gráfico ampliado com conversa e aceitação de missão.
+
 ## [2.0.0-alpha.3] — 2026-11-18
 
 - Exploração com probabilidades do terminal: combate, baú, armadilha, fogueira e encontros narrativos.

@@ -30,6 +30,7 @@ public final class Aplicativo extends Application {
     private StackPane arena;
     private String nomeHeroi = "";
     private int abaVila;
+    private int abaMissoes;
     private boolean modoHardcore;
     private final Salvamento salvamento = Salvamento.padrao();
 
@@ -130,7 +131,7 @@ public final class Aplicativo extends Application {
         Node corpo=s.talentos()>0?talentos(s):switch(pagina) {
             case "Mapa" -> mapa(s);
             case "Mochila" -> inventario(s);
-            case "Missões" -> opcoes("O diário da sua jornada", "Aceite e entregue missões ao visitar a vila.",s.missoes(),MISSAO);
+            case "Missões" -> moradoresEMissoes(s);
             case "Serviços" -> servicos(s);
             default -> jornada(s);
         };
@@ -147,7 +148,7 @@ public final class Aplicativo extends Application {
         boolean combate=s.fase()==EstadoJogo.Fase.COMBATE;
         for(String p:List.of("Jornada","Mapa","Mochila","Missões","Serviços")) {
             Button b=botao(p,p.equals(pagina)?"nav-active":"nav",()->{pagina=p;renderizar();});
-            b.setDisable(s.talentos()>0 || (s.fase()!=EstadoJogo.Fase.EXPLORACAO && !(combate && p.equals("Mochila")) && !p.equals("Jornada")) || (p.equals("Mercador")||p.equals("Serviços"))&&!s.localId().equals("VILA"));
+            b.setDisable(s.talentos()>0 || (s.fase()!=EstadoJogo.Fase.EXPLORACAO && !((combate || s.fase()==EstadoJogo.Fase.PAUSA_TORRE) && p.equals("Mochila")) && !p.equals("Jornada")) || (p.equals("Mercador")||p.equals("Serviços"))&&!s.localId().equals("VILA"));
             v.getChildren().add(b);
         }
         v.getChildren().add(espaco());
@@ -170,7 +171,7 @@ public final class Aplicativo extends Application {
         if(s.fase()==EstadoJogo.Fase.EVENTO)return narrativa(s.narrativa());
         VBox v=new VBox(14);boolean combate=s.fase()==EstadoJogo.Fase.COMBATE;
         String titulo=combate?"O confronto":s.fase()==EstadoJogo.Fase.VITORIA?"Aurora verá outro amanhecer":s.fase()==EstadoJogo.Fase.DERROTA?"Uma lenda chega ao fim":s.fase()==EstadoJogo.Fase.RECOMPENSA?(s.heroi().hp()>0&&s.inimigo().hp()==0?"O caminho está livre":"De volta ao abrigo"):s.local();
-        v.getChildren().add(linha(texto(titulo,"heading"),espaco(),texto(combate?"RODADA "+s.rodada():"REINO DE AURORA","eyebrow")));
+        v.getChildren().add(linha(texto(titulo,"heading"),espaco(),texto((s.andarTorre()>0?"ANDAR "+s.andarTorre()+" / 3  ·  ":"")+(combate?"RODADA "+s.rodada():"REINO DE AURORA"),"eyebrow")));
         Cenario cena=new Cenario(s.localId(),s.classe(),s.inimigo()==null?null:s.inimigo().tipo(),!s.periodo().equals("Manhã")&&!s.periodo().equals("Tarde"));
         arena=new StackPane(cena);arena.getStyleClass().add("arena");VBox.setVgrow(arena,Priority.ALWAYS);
         if(combate && s.inimigo().carregando()) {
@@ -183,6 +184,12 @@ public final class Aplicativo extends Application {
                     botao("Mochila","secondary",()->{pagina="Mochila";renderizar();}),botao("Analisar","ghost",()->mensagem(s.inimigo().nome(),s.inimigo().afinidades()+"\nAtaque "+s.inimigo().ataque()+" · Defesa "+s.inimigo().defesa()+" · Agilidade "+s.inimigo().agilidade())),
                     botao("Fugir","ghost",()->agir(AcaoJogo.de(FUGIR))));
             v.getChildren().add(acoes);
+        } else if(s.fase()==EstadoJogo.Fase.PAUSA_TORRE) {
+            v.getChildren().add(texto("Andar "+s.andarTorre()+" concluído. Prepare-se antes de "+(s.andarTorre()==2?"enfrentar o Observador.":"continuar subindo.")+" Descer reinicia a subida; o tempo não avança nesta pausa.","intro"));
+            v.getChildren().add(new FlowPane(12,10,
+                botao(s.andarTorre()==2?"ENFRENTAR O OBSERVADOR":"CONTINUAR SUBINDO","primary",()->agir(AcaoJogo.de(CONTINUAR))),
+                botao("Preparar equipamentos e itens","secondary",()->{pagina="Mochila";renderizar();}),
+                botao("Descer da torre","ghost",()->agir(AcaoJogo.de(DESCER_TORRE)))));
         } else if(s.fase()!=EstadoJogo.Fase.EXPLORACAO) {
             v.getChildren().add(texto(ultimoResultado,"intro"));
             v.getChildren().add(s.fase()==EstadoJogo.Fase.RECOMPENSA?botao("CONTINUAR   →","primary",()->agir(AcaoJogo.de(CONTINUAR))):botao("VOLTAR AO MENU","primary",()->{jogo=null;titulo();}));
@@ -219,6 +226,20 @@ public final class Aplicativo extends Application {
         v.getChildren().add(opcoes("Mochila", "Selecione um consumível para usar ou um equipamento para vestir.",s.inventario(),ITEM));
         VBox.setVgrow(v.getChildren().getLast(),Priority.ALWAYS);return v;
     }
+    private Node moradoresEMissoes(EstadoJogo s) {
+        List<EstadoJogo.Opcao> moradores=new ArrayList<>();
+        for(int i=0;i<Moradores.TODOS.size();i++) {
+            var m=Moradores.TODOS.get(i);
+            moradores.add(new EstadoJogo.Opcao(i,m.nome(),"Conversar e consultar as missões de "+m.id()+".",s.localId().equals("VILA")));
+        }
+        TabPane abas=new TabPane(
+            new Tab("Moradores",opcoes("As vozes de Aurora","Visite a vila para conversar com seus moradores.",moradores,CONVERSAR)),
+            new Tab("Diário",opcoes("O diário da sua jornada","Aceite e entregue missões ao visitar a vila.",s.missoes(),MISSAO)));
+        abas.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        abas.getSelectionModel().select(abaMissoes);
+        abas.getSelectionModel().selectedIndexProperty().addListener((o,a,b)->abaMissoes=b.intValue());
+        return abas;
+    }
     private Node opcoes(String titulo,String subtitulo,List<EstadoJogo.Opcao> lista,AcaoJogo.Tipo tipo) {
         return opcoes(titulo,subtitulo,lista,tipo,true);
     }
@@ -230,6 +251,7 @@ public final class Aplicativo extends Application {
             VBox descricao=new VBox(5,texto(o.nome(),"card-title"),texto(o.descricao(),"muted"));HBox.setHgrow(descricao,Priority.ALWAYS);
             boolean eq=tipo==ITEM&&o.descricao().startsWith("Equipamento");
             String rotulo=switch(tipo) {
+                case CONVERSAR -> "Conversar";
                 case COMPRAR -> "Comprar"; case VENDER -> "Vender"; case MELHORAR -> "Melhorar";
                 case CRIAR -> "Criar"; case CURAR -> "Receber cura"; case DOAR -> "Doar";
                 case CONTRATAR -> "Contratar"; case DISPENSAR -> "Dispensar"; case DESCANSAR -> "Descansar";
@@ -392,7 +414,10 @@ public final class Aplicativo extends Application {
             ()->{snapshot("21-escolha");clicar("Continuar jornada");clicar("EXPLORAR OS ARREDORES");},
             ()->{snapshot("05-combate");clicar("1  Atacar");},
             ()->{snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},
-            ()->{snapshot("07-compacto");janela.close();Platform.exit();}
+            ()->{snapshot("07-compacto");jogo=new MotorJogo("Arthur","Paladino",false,41L);historico.clear();pagina="Missões";renderizar();},
+            ()->{snapshot("22-moradores");agir(new AcaoJogo(CONVERSAR,0));},
+            ()->{snapshot("23-dialogo");clicar("Aceitar: Praga na Floresta");},
+            ()->{if(!jogo.estado().narrativa().texto().contains("Conto com você"))throw new IllegalStateException("Missão não foi aceita na conversa.");clicar("Encerrar conversa");snapshot("24-conversa-concluida");janela.close();Platform.exit();}
         );
         passoSmoke(passos,0);
     }

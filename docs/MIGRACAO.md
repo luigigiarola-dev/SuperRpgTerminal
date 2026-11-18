@@ -7,7 +7,8 @@ A versão original do terminal é `v1.0.0`. Esta primeira entrega gráfica é
 o sufixo `alpha.1` deixa explícito que a migração ainda não está completa.
 A entrega `v2.0.0-alpha.2` completa os serviços da vila e acrescenta validação
 automatizada em Windows, macOS e Linux com Java 21 e 26.
-A entrega atual, `v2.0.0-alpha.3`, migra eventos de exploração, dados, rumores e charada diária.
+A entrega `v2.0.0-alpha.3` migra eventos de exploração, dados, rumores e charada diária.
+A entrega atual, `v2.0.0-alpha.4`, acrescenta moradores e pausas entre andares da torre.
 
 As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
 incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
@@ -50,13 +51,15 @@ paridade de todos os sistemas nem acabamento artístico final.
 - [x] Testes e roteiro gráfico automatizados nos três sistemas de destino.
 - [x] Exploração aleatória com encontros narrativos e escolhas.
 - [x] Dados, rumores e charada diária com persistência do limite.
+- [x] Conversas dos cinco moradores com missões e bloqueio de Aldric por nível.
+- [x] Pausas entre andares da torre, mochila e retirada voluntária.
 - [ ] Paridade completa com o terminal.
 - [ ] Arte final, áudio, efeitos avançados e instaladores independentes de Java.
 
 ## Próximas entregas, em ordem
 
-1. Completar diálogos de NPCs e revisar a integração narrativa de toda a campanha.
-2. Completar as pausas entre andares da torre e permitir gestão de itens/retirada como no terminal.
+1. Revisar a integração narrativa de toda a campanha, incluindo introdução e encerramento.
+2. Conferir manualmente diálogos, torre, atalhos e inventário em diferentes tamanhos de janela.
 3. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
 4. Extrair regras ainda repetidas entre a orquestração do console e a gráfica, substituir a ponte
    de mensagens por eventos estruturados adicionais, injetar RNG e dividir os serviços por domínio.
@@ -75,8 +78,15 @@ A exploração gráfica segue as probabilidades do terminal. As escolhas são um
 sem leituras bloqueantes; a interface não permite viajar, salvar ou iniciar outra ação
 antes de resolver o encontro. Resultados precisam ser confirmados e não pagam recompensas
 novamente. Escolhas sem recursos aparecem indisponíveis, com alternativas para seguir adiante.
-Na torre, “Continuar” avança
-automaticamente ao próximo combate; a parada intermediária completa ainda está pendente.
+Na torre, confirmar a recompensa abre a fase `PAUSA_TORRE`. Itens e equipamentos são
+permitidos; viajar, coletar, acampar e salvar não são. Descer encerra a subida sem desfazer
+recompensas. A próxima tentativa recomeça no andar 1. O tempo avança somente ao iniciar
+a subida, como no terminal; após dois andares, o terceiro combate é o Observador.
+
+As conversas preservam as falas originais e o bloqueio de Aldric antes do nível 4.
+Diferentemente da entrega automática do console, a UI exige clicar para entregar cada
+missão. O diário mantém seus atalhos; a conversa filtra missões pelo morador, atualiza os
+pré-requisitos após cada entrega e permite escolher talentos antes de prosseguir.
 
 A recompensa da missão final e a liberdade de enfrentar Ignis apenas com a chave seguem o
 comportamento da referência: o encerramento não exige aceitar a missão. Isso será objeto de

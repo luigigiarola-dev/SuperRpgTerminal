@@ -6,7 +6,7 @@ import static br.com.superrpg.jogo.AcaoJogo.Tipo.*;
 
 /** Eventos com escolhas são estados explícitos; não há leitura de teclado nem espera. */
 final class Aventuras {
-    private enum Tipo { RESULTADO, VIAJANTE, SANTUARIO, COFRE, MERCADOR, CHARADA }
+    private enum Tipo { RESULTADO, VIAJANTE, SANTUARIO, COFRE, MERCADOR, CHARADA, MORADOR }
     private static final String[] CONSUMIVEIS = {"Poção de Cura", "Elixir de Mana", "Antídoto", "Bomba de Fogo", "Pergaminho do Trovão"};
     private static final String[][] CHARADAS = {
         {"O que é, o que é: cai em pé e corre deitada?", "chuva"},
@@ -22,6 +22,29 @@ final class Aventuras {
     private Tipo tipo;
     private Item oferta;
     private int precoOferta, charada;
+    private Moradores.Morador morador;
+
+    void conversar(int indice) {
+        if(indice<0 || indice>=Moradores.TODOS.size())return;
+        morador=Moradores.TODOS.get(indice);
+        if(morador.id().equals("Aldric") && h.nivel<4) {
+            resultado(morador.nome(),"Ainda é cedo, jovem. Prove seu valor ajudando a vila e volte mais forte (Nível 4).");
+            return;
+        }
+        atualizarConversa(morador.falas().get(sorte.nextInt(morador.falas().size())));
+    }
+
+    private void atualizarConversa(String fala) {
+        List<Opcao> opcoes=new ArrayList<>();
+        for(int i=0;i<jogo.diario.missoes.size();i++) {
+            Missao m=jogo.diario.missoes.get(i);
+            if(!m.doador.equals(morador.id()))continue;
+            String status=m.estado==2?"Concluída":m.pronta(h)?"Entregar":m.estado==1?"Em andamento":jogo.disponivel(m)?"Aceitar":"Bloqueada";
+            opcoes.add(escolha(i+1,status+": "+m.titulo,m.desc+"\n"+m.objetivo(h)+"\n"+m.recompensa(),m.pronta(h)||jogo.disponivel(m)));
+        }
+        opcoes.add(escolha(0,"Encerrar conversa","Voltar à jornada.",true));
+        abrir(Tipo.MORADOR,morador.nome(),fala,opcoes.toArray(Opcao[]::new));
+    }
 
     Aventuras(MotorJogo jogo, Random sorte) { this.jogo=jogo;h=jogo.heroi;this.sorte=sorte; }
     Narrativa estado() { return narrativa; }
@@ -101,6 +124,13 @@ final class Aventuras {
         if(!valido){Eventos.texto("Escolha indisponível.");return;}
         int op=acao.indice();
         switch(tipo) {
+            case MORADOR -> {
+                if(op==0) { narrativa=null;tipo=null;morador=null;jogo.fase=Fase.EXPLORACAO;return; }
+                Missao m=jogo.diario.missoes.get(op-1);
+                boolean entrega=m.pronta(h);
+                jogo.missao(op-1);
+                atualizarConversa(entrega?"Você conseguiu! Aqui está sua recompensa por \""+m.titulo+"\". "+m.recompensa():"Conto com você. Boa sorte!");
+            }
             case RESULTADO -> { narrativa=null;tipo=null;oferta=null;jogo.fase=Fase.EXPLORACAO; }
             case VIAJANTE -> {
                 if(op==1) {

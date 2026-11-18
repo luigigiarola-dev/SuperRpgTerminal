@@ -52,7 +52,7 @@ jobs:
         run: xvfb-run -a -s '-screen 0 1440x1000x24' ./build/install/super-rpg/bin/super-rpg --smoke
       - name: Confirmar conclusão do roteiro gráfico
         shell: bash
-        run: test -s build/screenshots/07-compacto.png
+        run: test -s build/screenshots/24-conversa-concluida.png
       - name: Guardar relatórios e capturas
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

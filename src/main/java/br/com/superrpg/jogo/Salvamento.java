@@ -34,7 +34,7 @@ public final class Salvamento {
     public boolean existe() { return Files.isRegularFile(arquivo); }
 
     public void salvar(MotorJogo jogo) throws IOException {
-        if(jogo.fase!=EstadoJogo.Fase.EXPLORACAO || jogo.heroi.talentosPendentes>0) throw new IOException("Conclua o combate ou evento e escolha seus talentos antes de salvar.");
+        if(jogo.fase!=EstadoJogo.Fase.EXPLORACAO || jogo.heroi.talentosPendentes>0) throw new IOException("Conclua o combate ou evento, desça da torre se estiver em uma subida e escolha seus talentos antes de salvar.");
         Heroi h=jogo.heroi;
         Dados dados=new Dados(4,h.getNome(),h.getClasse(),jogo.hardcore,h.nivel,h.xp,h.hp,h.hpMax,h.mana,h.manaMax,h.atk,h.def,h.agi,h.ouro,h.honra,h.abates,
                 jogo.dia,jogo.periodo,jogo.local.name(),Arrays.stream(h.equip).map(Salvamento::item).toList(),h.inv.stream().map(Salvamento::item).toList(),

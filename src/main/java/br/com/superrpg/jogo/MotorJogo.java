@@ -52,12 +52,22 @@ public final class MotorJogo {
             return;
         }
         if (fase == Fase.EVENTO) { aventuras.responder(a); return; }
+        if (fase == Fase.PAUSA_TORRE) {
+            switch (a.tipo()) {
+                case CONTINUAR -> { andarTorre++; iniciarCombate(andarTorre == 3 ? chefeTorre() : Bestiario.sortear(Local.TORRE, heroi.nivel, noite())); }
+                case DESCER_TORRE -> { andarTorre = 0; fase = Fase.EXPLORACAO; Eventos.texto("Você desce a torre. Uma nova subida começa no primeiro andar."); }
+                case ITEM -> usarFora(a.indice());
+                case EQUIPAR -> equipar(a.indice());
+                default -> { }
+            }
+            return;
+        }
         if (fase == Fase.COMBATE) { comandoCombate(a); return; }
         if (fase == Fase.VITORIA || fase == Fase.DERROTA) return;
         if (fase == Fase.RECOMPENSA) {
             if (a.tipo() == AcaoJogo.Tipo.CONTINUAR) {
                 fase = Fase.EXPLORACAO; inimigo = null;
-                if (andarTorre > 0 && andarTorre < 3) { andarTorre++; iniciarCombate(andarTorre == 3 ? chefeTorre() : Bestiario.sortear(Local.TORRE, heroi.nivel, noite())); }
+                if (andarTorre > 0 && andarTorre < 3) fase = Fase.PAUSA_TORRE;
                 else andarTorre = 0;
             }
             return;
@@ -76,9 +86,8 @@ public final class MotorJogo {
             }
             case MISSAO -> missao(a.indice());
             case ITEM -> usarFora(a.indice());
-            case EQUIPAR -> {
-                if (indiceValido(a.indice(), heroi.inv.size()) && heroi.inv.get(a.indice()) instanceof Equipamento e) heroi.equipar(e);
-            }
+            case EQUIPAR -> equipar(a.indice());
+            case CONVERSAR -> { if (local == Local.VILA) aventuras.conversar(a.indice()); }
             case COMPRAR -> comprar(a.indice());
             case VENDER, MELHORAR, CRIAR, CURAR, DOAR, CONTRATAR, DISPENSAR -> new ServicosVila(this, sorte).executar(a);
             case DADOS, RUMOR, CHARADA -> { if (local == Local.VILA) aventuras.taverna(a); }
@@ -233,7 +242,7 @@ public final class MotorJogo {
         return true;
     }
 
-    private void missao(int indice) {
+    void missao(int indice) {
         if (local != Local.VILA || !indiceValido(indice, diario.missoes.size())) return;
         Missao m = diario.missoes.get(indice);
         if (m.pronta(heroi)) {
@@ -244,7 +253,10 @@ public final class MotorJogo {
         } else if (disponivel(m)) { m.estado = 1; Eventos.texto("Missão aceita: " + m.titulo); }
     }
 
-    private boolean disponivel(Missao m) { return m.estado == 0 && heroi.nivel >= m.nivelMin && (m.requer == null || diario.concluida(m.requer)); }
+    boolean disponivel(Missao m) { return m.estado == 0 && heroi.nivel >= m.nivelMin && (m.requer == null || diario.concluida(m.requer)); }
+    private void equipar(int indice) {
+        if (indiceValido(indice, heroi.inv.size()) && heroi.inv.get(indice) instanceof Equipamento e) heroi.equipar(e);
+    }
     private void usarFora(int i) {
         if (!indiceValido(i, heroi.inv.size())) return;
         Item item = heroi.inv.get(i);
@@ -297,7 +309,7 @@ public final class MotorJogo {
         return new EstadoJogo(fase, personagem(heroi), inimigo == null ? null : personagem(inimigo), heroi.getClasse(), local.nome, local.name(),
                 dia, SuperRpgTerminal.PERIODOS[periodo], heroi.ouro, heroi.xp, heroi.xpProximo(), heroi.honra, heroi.talentosPendentes, hardcore, rodada,
                 List.copyOf(hs), List.copyOf(inv), List.copyOf(locais), List.copyOf(ms), List.copyOf(loja), eq,
-                new ServicosVila(this, sorte).estado(), aventuras.estado(), charadaHoje);
+                new ServicosVila(this, sorte).estado(), aventuras.estado(), charadaHoje, andarTorre);
     }
     private Personagem personagem(Entidade e) {
         String afinidades = e.afinidade.entrySet().stream().map(a -> a.getKey().nome + " ×" + a.getValue()).reduce((a,b) -> a + " · " + b).orElse("Sem afinidades especiais");
