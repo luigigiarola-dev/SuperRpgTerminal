@@ -7,6 +7,15 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## [2.0.0-alpha.5] — 2026-11-18
+
+- Corrige a recuperação de 30% de vida e mana após vencer uma emboscada no acampamento,
+  preservando o comportamento original. Fuga e derrota cancelam o descanso pendente.
+- Testa a sequência de missões até Ignis nas cinco classes, com resultados de combate
+  controlados, consumo/entrega de recursos, desbloqueio da torre, chave e checkpoints.
+- 8 novos casos, totalizando 89 testes. Não substituem a avaliação de equilíbrio da campanha.
+- Documenta a entrega futura de aplicativos com Java incluído para Windows e macOS.
+
 ## [2.0.0-alpha.4] — 2026-11-18
 
 - Conversas com Mira, Lira, Borin, Aldric e Gus, preservando as falas do terminal.

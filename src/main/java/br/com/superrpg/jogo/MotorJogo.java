@@ -14,6 +14,7 @@ public final class MotorJogo {
     Fase fase = Fase.EXPLORACAO;
     private boolean heroiPrimeiro;
     private int andarTorre;
+    private boolean descansoAposCombate;
     private final Random sorte;
     final Aventuras aventuras;
     boolean charadaHoje;
@@ -139,7 +140,11 @@ public final class MotorJogo {
     private void acampar() {
         if (local.material() == null) return;
         avancar();
-        if (sorte.nextInt(100) < (noite() ? 35 : 15)) { encontro(); return; }
+        if (sorte.nextInt(100) < (noite() ? 35 : 15)) { descansoAposCombate = true; encontro(); return; }
+        recuperarAcampamento();
+    }
+
+    private void recuperarAcampamento() {
         heroi.curar(heroi.hpMax * 30 / 100); heroi.modificarMana(heroi.manaMax * 30 / 100);
         heroi.removerNegativos(); Eventos.texto("A fogueira aquece a noite. +30% de vida e mana.");
     }
@@ -188,7 +193,7 @@ public final class MotorJogo {
                 if (inimigo.chefe) { Eventos.texto("Não há saída deste confronto."); return; }
                 int chance = Math.max(15, Math.min(85, 45 + (heroi.getAgilidade() - inimigo.getAgilidade()) * 2));
                 if (sorte.nextInt(100) < chance) {
-                    heroi.limparEfeitos(); fase = Fase.EXPLORACAO; inimigo = null; andarTorre = 0;
+                    heroi.limparEfeitos(); fase = Fase.EXPLORACAO; inimigo = null; andarTorre = 0; descansoAposCombate = false;
                     Eventos.emitir(new EventoJogo(EventoJogo.Tipo.FUGA, "", 0, "Você escapou do confronto.")); return;
                 }
                 Eventos.texto("O inimigo bloqueou sua fuga.");
@@ -215,6 +220,7 @@ public final class MotorJogo {
     private boolean encerrarCombate() {
         if (!heroi.estaVivo()) {
             andarTorre = 0;
+            descansoAposCombate = false;
             Eventos.emitir(new EventoJogo(EventoJogo.Tipo.DERROTA, heroi.getNome(), 0, "Você caiu em combate."));
             if (hardcore) fase = Fase.DERROTA;
             else {
@@ -237,6 +243,7 @@ public final class MotorJogo {
         fase = inimigo instanceof DragaoAncestral ? Fase.VITORIA : Fase.RECOMPENSA;
         if (fase == Fase.VITORIA && diario.obter("dragao").estado == 1) diario.obter("dragao").estado = 2;
         heroi.ganharXp(inimigo.xpRec);
+        if (descansoAposCombate) { descansoAposCombate = false; recuperarAcampamento(); }
         Eventos.emitir(new EventoJogo(EventoJogo.Tipo.VITORIA, inimigo.getNome(), ouro,
                 "Vitória! +" + ouro + " de ouro · +" + inimigo.xpRec + " XP"));
         return true;

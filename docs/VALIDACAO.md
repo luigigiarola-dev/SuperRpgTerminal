@@ -30,6 +30,22 @@ Uma execução pode durar até 20 minutos por ambiente; falhas não cancelam os 
 
 ## Limites e conferência manual
 
+### Progressão controlada nas cinco classes
+
+`CampanhaTest` percorre a cadeia de missões até Ignis para Paladino, Necromante,
+Arqueiro, Mago e Ladino. Verifica aceitação, pré-requisitos, recompensa de entrega
+única, consumo de coleta, torre com dois andares e chefe, Chave do Dragão, acesso ao
+Covil e encerramento. A cada entrega, salva e recarrega a jornada, comparando o estado
+persistente; a rodada do combate anterior é transitória e não pertence ao save.
+
+Os adversários são colocados em condição de derrota e os materiais de coleta são
+fornecidos pelo teste. XP e recompensas seguem o motor real, sem aumentar os atributos
+do herói artificialmente. Portanto, esses casos **não** comprovam dificuldade, uso
+eficiente de habilidades, equilíbrio entre classes ou uma partida real completa.
+Há também regressões específicas para vitória, fuga e derrota em emboscadas no acampamento.
+
+### Conferência manual pendente
+
 Um resultado verde comprova o fluxo automatizado naquele ambiente. Não comprova uma
 campanha inteira nem a qualidade visual de todas as telas. Em particular, o runner
 Windows Server não substitui a conferência em um computador com Windows 10/11.
