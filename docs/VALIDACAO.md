@@ -24,6 +24,13 @@ moradores, conversa com Mira, aceita uma missão e encerra a conversa. A captura
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.
 
+Nas três combinações com Java 21, a automação também gera o aplicativo nativo com
+`packageBundle` e executa seu lançador com `--smoke`. Usa uma pasta de trabalho nova
+e exige uma nova captura final, sem reaproveitar o sucesso do roteiro anterior.
+`JAVA_HOME` aponta para uma pasta inexistente nessa execução. Isso confirma o uso do
+runtime incluído pelo lançador, mas não substitui testar num computador sem JDK.
+Somente após essa etapa o ZIP/tar.gz é disponibilizado como artefato `aplicativo-*`.
+
 A última captura é obrigatória para a execução ser considerada concluída. Relatórios
 JUnit e capturas são guardados como artefatos por 14 dias, inclusive quando há falhas.
 Uma execução pode durar até 20 minutos por ambiente; falhas não cancelam os demais.

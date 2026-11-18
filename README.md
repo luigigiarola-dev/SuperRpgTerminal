@@ -3,7 +3,7 @@
 ## Versões
 
 - **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
-- **v2.0.0-alpha.5:** prévia gráfica em JavaFX com serviços, exploração, minijogos, moradores, pausas na torre e correção do acampamento. A branch `main` reúne o desenvolvimento
+- **v2.0.0-alpha.6:** prévia gráfica com aplicativos portáteis e Java incluído. A branch `main` reúne o desenvolvimento
   atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
@@ -61,6 +61,13 @@ Descer mantém recompensas, mas reinicia a próxima subida no primeiro andar. A 
 não avança o relógio; salvar só é permitido depois de descer ou concluir a torre.
 
 ### Executar a interface
+
+**Sem terminal:** baixe o pacote `SuperRPG-...` compatível com seu sistema e arquitetura
+na release alpha 6. Extraia o arquivo completo e abra `SuperRPG.exe` no Windows ou
+`SuperRPG.app` no Mac. Esses pacotes incluem Java. Leia as
+[instruções de distribuição e avisos de segurança](docs/DISTRIBUICAO.md).
+
+**Pelo código-fonte:**
 
 Requer **JDK 21 a 26**. Não é necessário instalar Gradle nem JavaFX manualmente.
 Na primeira execução, o Gradle Wrapper baixa as dependências; é necessário acesso à internet.
@@ -126,15 +133,16 @@ A distribuição fica em `build/install/super-rpg/`, com iniciadores em `bin/`.
 Ela inclui as bibliotecas, mas ainda requer Java instalado. Gere a distribuição no sistema/arquitetura
 de destino: os componentes nativos de JavaFX são específicos da plataforma.
 
-**Entrega final planejada, ainda não disponível:** instalador `.exe` e atalho no Windows;
-aplicativo `.app`, distribuído em `.dmg`, no macOS. O Java será incluído para permitir
-abrir o jogo sem terminal e sem instalar Java separadamente. Os pacotes serão gerados
-e testados em cada plataforma; assinatura e notarização serão tratadas nessa etapa.
+**Aplicativos portáteis:** `./gradlew packageBundle` (Windows: `gradlew.bat packageBundle`)
+gera em `build/native` um aplicativo com runtime incluído, instruções e licenças.
+A automação testa o executável nativo em cada sistema com Temurin 21 antes de arquivá-lo.
+Instaladores com atalhos, `.dmg`, assinatura e notarização ainda estão planejados.
 
 No Windows, use `.\gradlew.bat test` e `.\gradlew.bat installDist` na pasta do projeto.
 Depois, execute `.\build\install\super-rpg\bin\super-rpg.bat`.
 Uma distribuição gerada no Mac não deve ser copiada para executar no Windows;
-gere-a no próprio Windows. Esta prévia não inclui instalador `.exe` nem Java embutido.
+gere-a no próprio Windows. `installDist` ainda exige Java externo; os pacotes de
+`packageBundle` incluem Java e um lançador `.exe`, mas não um instalador.
 
 Validação inicial realizada em macOS Apple Silicon; o roteiro gráfico também executa nos
 ambientes Windows e Linux do GitHub. A conferência manual completa continua pendente.

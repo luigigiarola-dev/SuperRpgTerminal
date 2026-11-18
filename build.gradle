@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'br.com.superrpg'
-version = '2.0.0-alpha.5'
+version = '2.0.0-alpha.6'
 
 repositories { mavenCentral() }
 
@@ -34,6 +34,45 @@ application {
     applicationDefaultJvmArgs = ['--enable-native-access=javafx.graphics']
 }
 test { useJUnitPlatform() }
+
+// App-image inclui o runtime: não depende de Java instalado pelo jogador.
+// Cada sistema/arquitetura deve gerar o próprio pacote.
+def nativeDir = layout.buildDirectory.dir('native')
+def appName = 'SuperRPG'
+def appDir = nativeDir.map { it.dir(os.contains('mac') ? "${appName}.app" : appName) }
+tasks.register('cleanNativeApp', Delete) {
+    // Somente o aplicativo gerado; nunca a pasta de saves do jogador.
+    delete(appDir)
+}
+tasks.register('packageApp', Exec) {
+    group = 'distribution'
+    description = 'Gera aplicativo nativo com Java incluído para o sistema atual.'
+    dependsOn installDist, tasks.named('cleanNativeApp')
+    inputs.dir(layout.buildDirectory.dir('install/super-rpg'))
+    inputs.property('releaseVersion', project.version.toString())
+    inputs.property('runtimeVersion', System.getProperty('java.runtime.version'))
+    // Gradle cria diretórios de saída antes de executar a tarefa; jpackage exige
+    // que o aplicativo ainda não exista, então declaramos apenas o diretório pai.
+    outputs.dir(nativeDir)
+    commandLine new File(System.getProperty('java.home'), "bin/jpackage${os.contains('win') ? '.exe' : ''}"),
+            '--type', 'app-image', '--name', appName,
+            '--dest', nativeDir.get().asFile,
+            '--module-path', layout.buildDirectory.dir('install/super-rpg/lib').get().asFile,
+            '--module', 'br.com.superrpg/br.com.superrpg.ui.Iniciar',
+            '--app-version', project.version.toString().split('-')[0],
+            '--description', "SuperRPG ${project.version} — prévia gráfica",
+            '--vendor', 'luigigiarola-dev',
+            '--java-options', '--enable-native-access=javafx.graphics'
+}
+tasks.register('packageBundle', Copy) {
+    group = 'distribution'
+    description = 'Gera aplicativo com Java incluído, instruções e licenças.'
+    dependsOn tasks.named('packageApp')
+    from('LICENSE')
+    from('docs/DISTRIBUICAO.md')
+    from('licenses') { into 'terceiros' }
+    into(nativeDir.map { it.dir('documentacao') })
+}
 tasks.register('console', JavaExec) {
     group = 'application'
     description = 'Executa a versão de terminal migrada.'

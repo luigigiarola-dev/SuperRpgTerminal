@@ -7,6 +7,13 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## [2.0.0-alpha.6] — 2026-11-18
+
+- Empacotamento com `jpackage`: aplicativo nativo e runtime incluído por plataforma.
+- Roteiro gráfico executado pelo lançador nativo em Windows, macOS e Linux com Java 21.
+- Arquivos portáteis, instruções de uso e avisos de licença das dependências.
+- Sem mudanças nas regras ou no formato de save. Instaladores e assinatura ainda pendentes.
+
 ## [2.0.0-alpha.5] — 2026-11-18
 
 - Corrige a recuperação de 30% de vida e mana após vencer uma emboscada no acampamento,
