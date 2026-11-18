@@ -8,7 +8,9 @@ o sufixo `alpha.1` deixa explícito que a migração ainda não está completa.
 A entrega `v2.0.0-alpha.2` completa os serviços da vila e acrescenta validação
 automatizada em Windows, macOS e Linux com Java 21 e 26.
 A entrega `v2.0.0-alpha.3` migra eventos de exploração, dados, rumores e charada diária.
-A entrega atual, `v2.0.0-alpha.4`, acrescenta moradores e pausas entre andares da torre.
+A entrega `v2.0.0-alpha.4` acrescenta moradores e pausas entre andares da torre.
+A entrega atual, `v2.0.0-alpha.5`, corrige o descanso após emboscada e testa a progressão
+controlada nas cinco classes. A campanha jogada normalmente ainda não foi validada por completo.
 
 As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
 incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
@@ -61,6 +63,8 @@ paridade de todos os sistemas nem acabamento artístico final.
 1. Revisar a integração narrativa de toda a campanha, incluindo introdução e encerramento.
 2. Conferir manualmente diálogos, torre, atalhos e inventário em diferentes tamanhos de janela.
 3. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
+   A sequência de missões, os desbloqueios e os checkpoints já têm testes controlados;
+   dificuldade, estratégia e experiência de jogo permanecem pendentes.
 4. Extrair regras ainda repetidas entre a orquestração do console e a gráfica, substituir a ponte
    de mensagens por eventos estruturados adicionais, injetar RNG e dividir os serviços por domínio.
 5. Refinar personagens, cenários e animações: movimento de ataque, projéteis, crítico, impacto,
@@ -78,6 +82,8 @@ A exploração gráfica segue as probabilidades do terminal. As escolhas são um
 sem leituras bloqueantes; a interface não permite viajar, salvar ou iniciar outra ação
 antes de resolver o encontro. Resultados precisam ser confirmados e não pagam recompensas
 novamente. Escolhas sem recursos aparecem indisponíveis, com alternativas para seguir adiante.
+Vencer uma emboscada no acampamento concede a recuperação de 30% prevista no terminal;
+fugir ou perder cancela esse descanso, sem transferi-lo para outro combate.
 Na torre, confirmar a recompensa abre a fase `PAUSA_TORRE`. Itens e equipamentos são
 permitidos; viajar, coletar, acampar e salvar não são. Descer encerra a subida sem desfazer
 recompensas. A próxima tentativa recomeça no andar 1. O tempo avança somente ao iniciar

@@ -3,7 +3,7 @@
 ## Versões
 
 - **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
-- **v2.0.0-alpha.4:** prévia gráfica em JavaFX com serviços, exploração, minijogos, moradores e pausas na torre. A branch `main` reúne o desenvolvimento
+- **v2.0.0-alpha.5:** prévia gráfica em JavaFX com serviços, exploração, minijogos, moradores, pausas na torre e correção do acampamento. A branch `main` reúne o desenvolvimento
   atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
@@ -104,6 +104,11 @@ a cópia `jornada.anterior.json` preserva o arquivo anterior à última gravaç�
 
 ### Testes e distribuição
 
+A suíte inclui uma sequência controlada de missões até Ignis para cada uma das cinco
+classes, com checkpoints de save. Os resultados de combate e os recursos de coleta são
+preparados nesses testes para verificar a progressão; isso não comprova o equilíbrio de
+uma campanha jogada normalmente. Consulte o escopo detalhado abaixo.
+
 O GitHub executa testes de regras, persistência e um roteiro gráfico em Windows, macOS
 e Linux, com Java 21 e 26. Consulte os resultados na aba
 [Actions](https://github.com/luigigiarola-dev/SuperRpgTerminal/actions/workflows/validacao.yml)
@@ -120,6 +125,11 @@ Ele requer uma sessão gráfica e não altera saves do usuário. Os testes unit�
 A distribuição fica em `build/install/super-rpg/`, com iniciadores em `bin/`.
 Ela inclui as bibliotecas, mas ainda requer Java instalado. Gere a distribuição no sistema/arquitetura
 de destino: os componentes nativos de JavaFX são específicos da plataforma.
+
+**Entrega final planejada, ainda não disponível:** instalador `.exe` e atalho no Windows;
+aplicativo `.app`, distribuído em `.dmg`, no macOS. O Java será incluído para permitir
+abrir o jogo sem terminal e sem instalar Java separadamente. Os pacotes serão gerados
+e testados em cada plataforma; assinatura e notarização serão tratadas nessa etapa.
 
 No Windows, use `.\gradlew.bat test` e `.\gradlew.bat installDist` na pasta do projeto.
 Depois, execute `.\build\install\super-rpg\bin\super-rpg.bat`.
