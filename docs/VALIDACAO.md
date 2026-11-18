@@ -14,9 +14,10 @@ pela aba Actions do GitHub.
 
 Cada combinação compila o projeto, executa os testes de regras e persistência, gera a
 distribuição e inicia o jogo pelo script distribuído (`super-rpg.bat` ou `super-rpg`).
-O roteiro `--smoke` cria um personagem, abre as seis abas dos serviços, realiza uma cura,
-confere o débito de ouro, abre vila e mapa, entra em combate, ataca e redimensiona a janela.
-Ele também captura a taverna na dimensão mínima. O Linux utiliza uma tela virtual Xvfb.
+O roteiro `--smoke` cria um personagem com semente reproduzível, abre as sete abas dos
+serviços, realiza uma cura, confere o débito de ouro, responde uma charada, joga dados,
+ouve um rumor, viaja, resolve o encontro com um viajante e entra em combate.
+Ele ataca e captura a janela reduzida, inclusive a taverna. O Linux utiliza uma tela virtual Xvfb.
 
 A última captura é obrigatória para a execução ser considerada concluída. Relatórios
 JUnit e capturas são guardados como artefatos por 14 dias, inclusive quando há falhas.

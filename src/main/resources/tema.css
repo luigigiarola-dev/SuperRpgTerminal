@@ -61,3 +61,6 @@
 .tab-pane .tab .tab-label { -fx-text-fill: #c6cfcb; }
 .tab-pane .tab:selected .tab-label { -fx-text-fill: #e1c68a; }
 .tab-pane .tab-content-area { -fx-padding: 16 0 0 0; }
+.spinner { -fx-background-color: #15262d; }
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button { -fx-background-color: #34433d; }
+.spinner .increment-arrow, .spinner .decrement-arrow { -fx-background-color: #e1c68a; }

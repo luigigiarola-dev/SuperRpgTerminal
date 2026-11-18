@@ -16,7 +16,7 @@ public final class Salvamento {
     record Dados(int versao, String nome, String classe, boolean hardcore, int nivel, int xp,
             int hp, int hpMax, int mana, int manaMax, int ataque, int defesa, int agilidade,
             int ouro, int honra, int abates, int dia, int periodo, String local,
-            List<ItemSalvo> equipamentos, List<ItemSalvo> inventario, String aliado, List<MissaoSalva> missoes) {}
+            List<ItemSalvo> equipamentos, List<ItemSalvo> inventario, String aliado, List<MissaoSalva> missoes, boolean charadaHoje) {}
 
     public Salvamento(Path arquivo) { this.arquivo = arquivo.toAbsolutePath(); }
     public static Salvamento padrao() {
@@ -34,11 +34,11 @@ public final class Salvamento {
     public boolean existe() { return Files.isRegularFile(arquivo); }
 
     public void salvar(MotorJogo jogo) throws IOException {
-        if(jogo.fase!=EstadoJogo.Fase.EXPLORACAO || jogo.heroi.talentosPendentes>0) throw new IOException("Conclua o combate e escolha seus talentos antes de salvar.");
+        if(jogo.fase!=EstadoJogo.Fase.EXPLORACAO || jogo.heroi.talentosPendentes>0) throw new IOException("Conclua o combate ou evento e escolha seus talentos antes de salvar.");
         Heroi h=jogo.heroi;
-        Dados dados=new Dados(3,h.getNome(),h.getClasse(),jogo.hardcore,h.nivel,h.xp,h.hp,h.hpMax,h.mana,h.manaMax,h.atk,h.def,h.agi,h.ouro,h.honra,h.abates,
+        Dados dados=new Dados(4,h.getNome(),h.getClasse(),jogo.hardcore,h.nivel,h.xp,h.hp,h.hpMax,h.mana,h.manaMax,h.atk,h.def,h.agi,h.ouro,h.honra,h.abates,
                 jogo.dia,jogo.periodo,jogo.local.name(),Arrays.stream(h.equip).map(Salvamento::item).toList(),h.inv.stream().map(Salvamento::item).toList(),
-                h.aliado==null?null:h.aliado instanceof LoboCinzento?"lobo":"lira",jogo.diario.missoes.stream().map(m->new MissaoSalva(m.id,m.estado,m.progresso)).toList());
+                h.aliado==null?null:h.aliado instanceof LoboCinzento?"lobo":"lira",jogo.diario.missoes.stream().map(m->new MissaoSalva(m.id,m.estado,m.progresso)).toList(),jogo.charadaHoje);
         restaurar(dados); // valida antes de substituir o arquivo existente
         Files.createDirectories(arquivo.getParent());
         Path temporario=Files.createTempFile(arquivo.getParent(),"jornada-",".tmp");
@@ -66,7 +66,7 @@ public final class Salvamento {
     }
     private static void exigir(boolean condicao,String mensagem) { if(!condicao)throw new IllegalArgumentException(mensagem); }
     private static MotorJogo restaurar(Dados d) {
-        exigir(d!=null&&d.versao()==3,"Versão inválida");
+        exigir(d!=null&&(d.versao()==3||d.versao()==4),"Versão inválida");
         exigir(d.nome()!=null&&!d.nome().isBlank()&&d.nome().length()<=30,"Nome inválido");
         exigir(d.nivel()>=1&&d.nivel()<=15&&d.xp()>=0&&d.xp()<d.nivel()*100,"Nível ou XP inválido");
         exigir(d.hpMax()>0&&d.hpMax()<=10000&&d.hp()>0&&d.hp()<=d.hpMax(),"Vida inválida");
@@ -86,6 +86,7 @@ public final class Salvamento {
         exigir(d.aliado()==null||List.of("lobo","lira").contains(d.aliado()),"Aliado inválido");
         if(d.aliado()!=null)h.aliado=d.aliado().equals("lobo")?new LoboCinzento():new IrmaLira();
         jogo.dia=d.dia();jogo.periodo=d.periodo();jogo.local=Local.valueOf(d.local());
+        jogo.charadaHoje=d.versao()==4&&d.charadaHoje();
         exigir(d.missoes()!=null&&d.missoes().size()==10,"Diário inválido");Set<String> vistos=new HashSet<>();
         for(MissaoSalva s:d.missoes()) {
             exigir(s!=null&&vistos.add(s.id()),"Missão duplicada");Missao m=jogo.diario.obter(s.id());
@@ -104,8 +105,9 @@ public final class Salvamento {
             List<ItemSalvo> inv=new ArrayList<>();if(!l.get(5).equals("-"))for(String i:l.get(5).split(";"))inv.add(itemV2(i));
             String[] t=l.get(7).split(",");exigir(t.length==5,"Tempo incompleto");
             List<MissaoSalva> ms=new ArrayList<>();for(String m:l.get(8).split(";")){String[] p=m.split(":");ms.add(new MissaoSalva(p[0],Integer.parseInt(p[1]),Integer.parseInt(p[2])));}
-            return restaurar(new Dados(3,l.get(2),l.get(1),Boolean.parseBoolean(t[3]),a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11],
-                    Integer.parseInt(t[0]),Integer.parseInt(t[1]),t[2],eq,inv,l.get(6).equals("-")?null:l.get(6),ms));
+            exigir(t[4].equals("true")||t[4].equals("false"),"Marcador da charada inválido");
+            return restaurar(new Dados(4,l.get(2),l.get(1),Boolean.parseBoolean(t[3]),a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11],
+                    Integer.parseInt(t[0]),Integer.parseInt(t[1]),t[2],eq,inv,l.get(6).equals("-")?null:l.get(6),ms,Boolean.parseBoolean(t[4])));
         } catch(RuntimeException e){throw new IOException("Não foi possível importar este save v2.",e);}
     }
     private static ItemSalvo itemV2(String s) {
