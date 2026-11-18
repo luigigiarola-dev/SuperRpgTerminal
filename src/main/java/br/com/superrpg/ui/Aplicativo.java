@@ -102,7 +102,7 @@ public final class Aplicativo extends Application {
         HBox centro=linha(retrato,descricao);VBox.setVgrow(centro,Priority.ALWAYS);
         CheckBox hardcore=new CheckBox("Hardcore — uma única vida");hardcore.setSelected(modoHardcore);hardcore.setOnAction(e->modoHardcore=hardcore.isSelected());
         conteudo.getChildren().addAll(nome,classes,centro,linha(hardcore,espaco(),botao("Voltar","ghost",this::titulo),botao("ENTRAR EM AURORA   →","primary",()->{
-            jogo=new MotorJogo(nomeHeroi,classeEscolhida,modoHardcore);historico.clear();
+            jogo=getParameters().getRaw().contains("--smoke")?new MotorJogo(nomeHeroi,classeEscolhida,modoHardcore,41L):new MotorJogo(nomeHeroi,classeEscolhida,modoHardcore);historico.clear();
             historico.add("Mira: Bem-vindo a Aurora. A vila precisa de você. Consulte as missões antes de partir.");pagina="Jornada";renderizar();
         })));
         trocar(conteudo);
@@ -121,6 +121,7 @@ public final class Aplicativo extends Application {
         EstadoJogo s=jogo.estado();
         if(s.fase()!=EstadoJogo.Fase.EXPLORACAO && !pagina.equals("Mochila")) pagina="Jornada";
         if(s.talentos()>0) pagina="Jornada";
+        if(s.fase()==EstadoJogo.Fase.EVENTO) pagina="Jornada";
         BorderPane shell=new BorderPane();shell.setLeft(lateral(s));
         VBox centro=new VBox(18);centro.setPadding(new Insets(26,30,22,30));
         HBox topo=linha(texto("AURORA  /  " + pagina.toUpperCase(Locale.ROOT),"eyebrow"),espaco(),
@@ -166,6 +167,7 @@ public final class Aplicativo extends Application {
         VBox box=new VBox(6,linha(a,espaco(),b),p);box.setMinHeight(Region.USE_PREF_SIZE);return box;
     }
     private Node jornada(EstadoJogo s) {
+        if(s.fase()==EstadoJogo.Fase.EVENTO)return narrativa(s.narrativa());
         VBox v=new VBox(14);boolean combate=s.fase()==EstadoJogo.Fase.COMBATE;
         String titulo=combate?"O confronto":s.fase()==EstadoJogo.Fase.VITORIA?"Aurora verá outro amanhecer":s.fase()==EstadoJogo.Fase.DERROTA?"Uma lenda chega ao fim":s.fase()==EstadoJogo.Fase.RECOMPENSA?(s.heroi().hp()>0&&s.inimigo().hp()==0?"O caminho está livre":"De volta ao abrigo"):s.local();
         v.getChildren().add(linha(texto(titulo,"heading"),espaco(),texto(combate?"RODADA "+s.rodada():"REINO DE AURORA","eyebrow")));
@@ -191,7 +193,7 @@ public final class Aplicativo extends Application {
             if(s.localId().equals("VILA")) {
                 acoes.getChildren().addAll(botao("EXPLORAR O MAPA   →","primary",()->{pagina="Mapa";renderizar();}),botao("Moradores e missões","secondary",()->{pagina="Missões";renderizar();}),botao("Descansar na taverna","secondary",()->agir(AcaoJogo.de(DESCANSAR))));
             } else {
-                acoes.getChildren().add(botao(s.localId().equals("COVIL")?"ENFRENTAR IGNIS":s.localId().equals("TORRE")?"SUBIR A TORRE":"PROCURAR UM CONFRONTO","primary",()->agir(AcaoJogo.de(EXPLORAR))));
+                acoes.getChildren().add(botao(s.localId().equals("COVIL")?"ENFRENTAR IGNIS":s.localId().equals("TORRE")?"SUBIR A TORRE":"EXPLORAR OS ARREDORES","primary",()->agir(AcaoJogo.de(EXPLORAR))));
                 if(!List.of("TORRE","COVIL").contains(s.localId())) acoes.getChildren().addAll(botao("Coletar recursos","secondary",()->agir(AcaoJogo.de(COLETAR))),botao("Acampar","secondary",()->agir(AcaoJogo.de(ACAMPAR))));
                 acoes.getChildren().add(botao("Voltar à vila","ghost",()->agir(new AcaoJogo(VIAJAR,0))));
             }
@@ -261,10 +263,38 @@ public final class Aplicativo extends Application {
                 new Tab("Venda",opcoes("Negociar com Tobias","Apenas itens da mochila. Itens de missão não podem ser vendidos.",vila.vendas(),VENDER)),
                 new Tab("Forja",opcoes("A forja de Borin","Melhore a arma ou armadura equipada até +5.",vila.forja(),MELHORAR)),
                 new Tab("Alquimia",opcoes("O laboratório de Mara","Os ingredientes são consumidos somente quando a receita está completa.",vila.receitas(),CRIAR)),
-                new Tab("Templo",templo),new Tab("Taverna",taverna));
+                new Tab("Templo",templo),new Tab("Taverna",taverna),new Tab("Jogos e rumores",jogos(s)));
         abas.getSelectionModel().select(abaVila);
         abas.getSelectionModel().selectedIndexProperty().addListener((o,a,b)->abaVila=b.intValue());
         VBox v=coluna(texto("Os serviços de Aurora","heading"),abas);VBox.setVgrow(abas,Priority.ALWAYS);return v;
+    }
+    private Node jogos(EstadoJogo s) {
+        Spinner<Integer> aposta=new Spinner<>(1,Math.max(1,Math.min(100,s.ouro())),Math.min(10,Math.max(1,s.ouro())));
+        aposta.setAccessibleText("Valor da aposta em ouro");aposta.setMaxWidth(140);
+        Button dados=botao("Jogar dados","primary",()->agir(new AcaoJogo(DADOS,aposta.getValue())));dados.setDisable(s.ouro()<1);
+        Button charada=botao("Aceitar charada","secondary",()->agir(AcaoJogo.de(CHARADA)));charada.setDisable(s.charadaHoje());
+        VBox dadosBox=coluna(texto("Dados com Gus","card-title"),texto("Dois dados para cada jogador. Maior soma ganha o valor apostado; empate não altera seu ouro. Limite: 100 ouro.","muted"),linha(aposta,dados));
+        VBox charadaBox=coluna(texto("Desafio diário","card-title"),texto(s.charadaHoje()?"Você já tentou hoje. Volte no próximo dia do jogo.":"Uma tentativa por dia, consumida ao aceitar. Acerto: 30–69 ouro e 40 XP.","muted"),charada);
+        VBox rumorBox=coluna(texto("Conversas ao pé do fogo","card-title"),texto("Gus tem notícias e conselhos sobre o reino. Ouvir é gratuito.","muted"),botao("Ouvir rumores","secondary",()->agir(AcaoJogo.de(RUMOR))));
+        for(VBox box:List.of(dadosBox,charadaBox,rumorBox))box.getStyleClass().add("panel");
+        return secoes(dadosBox,charadaBox,rumorBox);
+    }
+    private Node narrativa(EstadoJogo.Narrativa n) {
+        VBox conteudo=coluna(texto("ENCONTROS E ESCOLHAS","eyebrow"),texto(n.titulo(),"heading"),texto(n.texto(),"intro"));
+        conteudo.setPadding(new Insets(18));
+        if(n.respostaLivre()) {
+            TextField resposta=new TextField();resposta.setId("resposta-charada");resposta.setPromptText("Sua resposta");resposta.setAccessibleText("Resposta à charada");
+            resposta.setTextFormatter(new TextFormatter<String>(c->c.getControlNewText().length()<=200?c:null));
+            Button enviar=botao("Responder","primary",()->agir(new AcaoJogo(RESPONDER,0,resposta.getText())));
+            enviar.disableProperty().bind(resposta.textProperty().isEmpty());
+            resposta.setOnAction(e->{if(!enviar.isDisabled())enviar.fire();});
+            conteudo.getChildren().addAll(resposta,enviar);
+        }
+        for(var escolha:n.escolhas()) {
+            Button b=botao(escolha.nome(),"secondary",()->agir(new AcaoJogo(ESCOLHER_EVENTO,escolha.id())));b.setDisable(!escolha.disponivel());
+            VBox card=coluna(texto(escolha.descricao(),"muted"),b);card.getStyleClass().add("panel");conteudo.getChildren().add(card);
+        }
+        return secoes(conteudo);
     }
     private void confirmarServico(String titulo,EstadoJogo.Opcao opcao,AcaoJogo acao) {
         Alert alerta=new Alert(Alert.AlertType.CONFIRMATION,opcao.descricao(),ButtonType.CANCEL,ButtonType.OK);
@@ -351,8 +381,15 @@ public final class Aplicativo extends Application {
                 if(jogo.estado().ouro()!=50)throw new IllegalStateException("Cura não foi debitada corretamente.");
                 ((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(5);},
             ()->{snapshot("12-taverna");janela.setWidth(1024);janela.setHeight(720);},
-            ()->{snapshot("13-taverna-compacta");clicar("Jornada");clicar("EXPLORAR O MAPA   →");},
-            ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));if(jogo.estado().fase()==EstadoJogo.Fase.EXPLORACAO)clicar("PROCURAR UM CONFRONTO");},
+            ()->{snapshot("13-taverna-compacta");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(6);},
+            ()->{snapshot("15-jogos");clicar("Aceitar charada");},
+            ()->{snapshot("16-charada");((TextField)raiz.lookup("#resposta-charada")).setText("teste");clicar("Responder");},
+            ()->{snapshot("17-resposta");clicar("Continuar jornada");clicar("Serviços");clicar("Jogar dados");},
+            ()->{snapshot("18-dados");clicar("Continuar jornada");clicar("Serviços");clicar("Ouvir rumores");},
+            ()->{snapshot("19-rumor");clicar("Continuar jornada");clicar("EXPLORAR O MAPA   →");},
+            ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));clicar("EXPLORAR OS ARREDORES");},
+            ()->{snapshot("20-viajante");clicar("Seguir caminho");},
+            ()->{snapshot("21-escolha");clicar("Continuar jornada");clicar("EXPLORAR OS ARREDORES");},
             ()->{snapshot("05-combate");clicar("1  Atacar");},
             ()->{snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},
             ()->{snapshot("07-compacto");janela.close();Platform.exit();}

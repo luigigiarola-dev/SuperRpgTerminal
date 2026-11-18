@@ -7,6 +7,16 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## [2.0.0-alpha.3] — 2026-11-18
+
+- Exploração com probabilidades do terminal: combate, baú, armadilha, fogueira e encontros narrativos.
+- Escolhas para viajante ferido, santuário, cofre e mercador errante; fonte de mana.
+- Dados com apostas de 1–100 ouro, rumores ligados ao progresso e charada diária com resposta livre.
+- Eventos exibidos em cartões com escolhas e resultados; outras ações ficam bloqueadas até a conclusão.
+- Save JSON formato 4 para preservar o limite diário da charada, com leitura do formato 3 e
+  importação do marcador do save de terminal. Versões anteriores não leem o novo formato.
+- 28 novos testes, totalizando 69; roteiro gráfico reproduzível com eventos e minijogos.
+
 ## [2.0.0-alpha.2] — 2026-11-17
 
 - Serviços da vila na interface: venda, forja, alquimia, cura, doação, contratação e dispensa de aliados.
@@ -55,4 +65,5 @@ Versão original completa do RPG executada no terminal.
 
 [2.0.0-alpha.1]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v2.0.0-alpha.1
 [2.0.0-alpha.2]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v2.0.0-alpha.2
+[2.0.0-alpha.3]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v2.0.0-alpha.3
 [1.0.0]: https://github.com/luigigiarola-dev/SuperRpgTerminal/releases/tag/v1.0.0

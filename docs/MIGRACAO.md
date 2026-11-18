@@ -5,8 +5,9 @@
 A versão original do terminal é `v1.0.0`. Esta primeira entrega gráfica é
 `v2.0.0-alpha.1`: o salto de versão representa a nova interface e a nova estrutura do projeto;
 o sufixo `alpha.1` deixa explícito que a migração ainda não está completa.
-A entrega atual, `v2.0.0-alpha.2`, completa os serviços da vila e acrescenta validação
+A entrega `v2.0.0-alpha.2` completa os serviços da vila e acrescenta validação
 automatizada em Windows, macOS e Linux com Java 21 e 26.
+A entrega atual, `v2.0.0-alpha.3`, migra eventos de exploração, dados, rumores e charada diária.
 
 As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
 incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
@@ -47,12 +48,14 @@ paridade de todos os sistemas nem acabamento artístico final.
 - [x] Cenários/avatares originais em código e teste visual em duas dimensões de janela.
 - [x] Venda, forja, alquimia, templo e contratação/dispensa de aliados na interface.
 - [x] Testes e roteiro gráfico automatizados nos três sistemas de destino.
+- [x] Exploração aleatória com encontros narrativos e escolhas.
+- [x] Dados, rumores e charada diária com persistência do limite.
 - [ ] Paridade completa com o terminal.
 - [ ] Arte final, áudio, efeitos avançados e instaladores independentes de Java.
 
 ## Próximas entregas, em ordem
 
-1. Migrar todos os eventos de exploração, dados, charadas, rumores e diálogos de NPCs.
+1. Completar diálogos de NPCs e revisar a integração narrativa de toda a campanha.
 2. Completar as pausas entre andares da torre e permitir gestão de itens/retirada como no terminal.
 3. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
 4. Extrair regras ainda repetidas entre a orquestração do console e a gráfica, substituir a ponte
@@ -68,8 +71,11 @@ Preservados os atributos iniciais, catálogo, habilidades, fórmula de dano, afi
 recargas, crescimento por nível, recompensas, missões e pré-requisitos. A morte Normal mantém
 a perda de 25% do ouro e o retorno à vila; Hardcore encerra a sessão.
 
-A exploração gráfica usa encontros garantidos na ação “Procurar um confronto”; baús, fontes,
-armadilhas e eventos com escolhas ainda não foram convertidos. Na torre, “Continuar” avança
+A exploração gráfica segue as probabilidades do terminal. As escolhas são uma fase `EVENTO`,
+sem leituras bloqueantes; a interface não permite viajar, salvar ou iniciar outra ação
+antes de resolver o encontro. Resultados precisam ser confirmados e não pagam recompensas
+novamente. Escolhas sem recursos aparecem indisponíveis, com alternativas para seguir adiante.
+Na torre, “Continuar” avança
 automaticamente ao próximo combate; a parada intermediária completa ainda está pendente.
 
 A recompensa da missão final e a liberdade de enfrentar Ignis apenas com a chave seguem o
@@ -77,8 +83,9 @@ comportamento da referência: o encerramento não exige aceitar a missão. Isso 
 uma decisão de design posterior, não de uma alteração silenciosa na migração.
 
 O gráfico permite salvar apenas na exploração, após recompensas e talentos. A versão original
-continua com o próprio save/ranking. O marcador de charada diária não migra enquanto a charada
-não fizer parte da UI. Nenhuma alegação de balanceamento humano foi feita nesta etapa.
+continua com o próprio save/ranking. O marcador de charada diária agora migra do terminal
+e é preservado no JSON formato 4. O formato 3 é aceito sem uma tentativa consumida, porque
+não continha esse campo. Nenhuma alegação de balanceamento humano foi feita nesta etapa.
 
 ## Verificação
 

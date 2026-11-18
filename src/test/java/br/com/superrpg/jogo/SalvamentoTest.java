@@ -31,9 +31,11 @@ class SalvamentoTest {
     }
     @Test void importaV2SemModificarOrigem() throws Exception {
         String conteudo="v2\nPaladino\nArthur\n1,0,160,160,50,50,30,15,8,60,0,0\nEspada Enferrujada|2;-;-;\nPoção de Cura|0;\nlobo\n2,1,VILA,false,false\npraga:1:2;lobos:0:0;ervas:0:0;ladrao:0:0;teias:0:0;fogo:0:0;ossos:0:0;seita:0:0;torre:0:0;dragao:0:0;\n";
+        conteudo=conteudo.replace("VILA,false,false","VILA,false,true");
         Path antigo=pasta.resolve("rpg_save.txt");Files.writeString(antigo,conteudo);
         MotorJogo jogo=new Salvamento(pasta.resolve("jornada.json")).importarV2(antigo);
         assertEquals(2,jogo.heroi.equip[0].melhoria);assertEquals(2,jogo.diario.obter("praga").progresso);
         assertEquals(2,jogo.dia);assertInstanceOf(LoboCinzento.class,jogo.heroi.aliado);assertEquals(conteudo,Files.readString(antigo));
+        assertTrue(jogo.charadaHoje);
     }
 }

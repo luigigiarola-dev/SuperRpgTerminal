@@ -15,8 +15,12 @@ public final class MotorJogo {
     private boolean heroiPrimeiro;
     private int andarTorre;
     private final Random sorte;
+    final Aventuras aventuras;
+    boolean charadaHoje;
 
     public MotorJogo(String nome, String classe, boolean hardcore) { this(nome, classe, hardcore, new Random()); }
+    /** Semente opcional para reproduzir escolhas de exploração e minijogos. */
+    public MotorJogo(String nome, String classe, boolean hardcore, long semente) { this(nome, classe, hardcore, new Random(semente)); }
     MotorJogo(String nome, String classe, boolean hardcore, Random sorte) {
         this.sorte = sorte;
         this.hardcore = hardcore;
@@ -32,6 +36,7 @@ public final class MotorJogo {
         };
         heroi.inv.add(new Pocao()); heroi.inv.add(new Pocao()); heroi.inv.add(new Elixir());
         heroi.equip[0] = (Equipamento) Fabrica.criar("Espada Enferrujada");
+        aventuras = new Aventuras(this, sorte);
     }
 
     public List<EventoJogo> executar(AcaoJogo acao) {
@@ -46,6 +51,7 @@ public final class MotorJogo {
             else Eventos.texto("Escolha seu talento antes de continuar.");
             return;
         }
+        if (fase == Fase.EVENTO) { aventuras.responder(a); return; }
         if (fase == Fase.COMBATE) { comandoCombate(a); return; }
         if (fase == Fase.VITORIA || fase == Fase.DERROTA) return;
         if (fase == Fase.RECOMPENSA) {
@@ -75,6 +81,7 @@ public final class MotorJogo {
             }
             case COMPRAR -> comprar(a.indice());
             case VENDER, MELHORAR, CRIAR, CURAR, DOAR, CONTRATAR, DISPENSAR -> new ServicosVila(this, sorte).executar(a);
+            case DADOS, RUMOR, CHARADA -> { if (local == Local.VILA) aventuras.taverna(a); }
             default -> { }
         }
     }
@@ -98,8 +105,9 @@ public final class MotorJogo {
         }
         avancar();
         if (local == Local.TORRE) { andarTorre = 1; encontro(); return; }
-        // Primeira fatia: encontros garantidos. Eventos narrativos serão migrados separadamente.
-        encontro();
+        int resultado = sorte.nextInt(10);
+        if (resultado <= 3) encontro();
+        else aventuras.explorar(resultado);
     }
 
     private Beholder chefeTorre() {
@@ -254,7 +262,7 @@ public final class MotorJogo {
     int preco(int base) { return Math.max(1, (int)Math.round(base * (heroi.honra >= 2 ? .9 : heroi.honra <= -2 ? 1.15 : 1))); }
     boolean noite() { return periodo >= 2; }
     private void avancar() {
-        periodo = (periodo + 1) % 4; if (periodo == 0) dia++;
+        periodo = (periodo + 1) % 4; if (periodo == 0) { dia++; charadaHoje = false; }
         heroi.curar(5); heroi.modificarMana(8);
     }
     private String bloqueio(Local l) {
@@ -289,7 +297,7 @@ public final class MotorJogo {
         return new EstadoJogo(fase, personagem(heroi), inimigo == null ? null : personagem(inimigo), heroi.getClasse(), local.nome, local.name(),
                 dia, SuperRpgTerminal.PERIODOS[periodo], heroi.ouro, heroi.xp, heroi.xpProximo(), heroi.honra, heroi.talentosPendentes, hardcore, rodada,
                 List.copyOf(hs), List.copyOf(inv), List.copyOf(locais), List.copyOf(ms), List.copyOf(loja), eq,
-                new ServicosVila(this, sorte).estado());
+                new ServicosVila(this, sorte).estado(), aventuras.estado(), charadaHoje);
     }
     private Personagem personagem(Entidade e) {
         String afinidades = e.afinidade.entrySet().stream().map(a -> a.getKey().nome + " ×" + a.getValue()).reduce((a,b) -> a + " · " + b).orElse("Sem afinidades especiais");

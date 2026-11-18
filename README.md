@@ -3,7 +3,7 @@
 ## Versões
 
 - **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
-- **v2.0.0-alpha.2:** prévia gráfica em JavaFX com os serviços da vila. A branch `main` reúne o desenvolvimento
+- **v2.0.0-alpha.3:** prévia gráfica em JavaFX com serviços, eventos de exploração e minijogos. A branch `main` reúne o desenvolvimento
   atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
@@ -24,14 +24,17 @@ Já disponíveis na interface:
 - Inventário, equipamentos, compra de suprimentos, missões e descanso na taverna.
 - Serviços da vila em abas: venda, forja, alquimia, templo e contratação/dispensa de aliados.
 - Custos, chances da forja e ingredientes faltantes visíveis, com confirmação de ações relevantes.
+- Exploração com combates, baús, armadilhas, fogueiras, fonte mística e encontros com escolhas.
+- Dados com Gus, rumores e uma tentativa de charada por dia do jogo, preservada no save.
 - Histórico de eventos, números flutuantes de dano/cura e opção de animações rápidas.
 - Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato interno 2
   do save legado. Esse número pertence ao formato do arquivo e não à versão pública do jogo.
 
-Ainda pendentes: eventos narrativos de exploração, dados, charadas, ranking gráfico, áudio,
-animações completas e instaladores com Java embutido.
-**Na prévia gráfica, procurar um confronto inicia um combate; a seleção aleatória de eventos da
-exploração original ainda será migrada.** Aliados importados de saves v2 já agem em combate.
+Ainda pendentes: diálogos completos de NPCs, pausas entre andares da torre, ranking gráfico,
+áudio, animações completas e instaladores com Java embutido.
+**Explorar os arredores** segue a distribuição original: 40% combate, 10% baú, 10% armadilha,
+10% fogueira e 30% encontro narrativo (viajante, santuário, cofre, mercador ou fonte).
+Conclua as escolhas e confirme o resultado antes de viajar ou salvar.
 
 Na vila, abra **Serviços** no menu lateral. Venda, forja e alquimia fecham à noite;
 templo e taverna funcionam em todos os períodos. A forja só melhora arma e armadura
@@ -39,6 +42,11 @@ equipadas, até +5, e cobra a tentativa mesmo se falhar. A alquimia é gratuita 
 todos os ingredientes. A contratação substitui o aliado atual sem reembolso.
 Preços e regras seguem o terminal, incluindo a venda de equipamento melhorado pelo
 valor-base de revenda e a doação fixa de 50 ouro, com honra limitada a +5.
+
+Na aba **Jogos e rumores**, aposte de 1 a 100 ouro nos dados, ouça Gus ou aceite uma
+charada. A tentativa é consumida ao aceitar, mesmo se desistir. Ela só é liberada no
+próximo dia do jogo; a resposta correta concede 30–69 ouro e 40 XP. O jogo de dados
+não avança o relógio e o empate não altera seu saldo.
 
 ### Executar a interface
 
@@ -76,8 +84,11 @@ Local do save `jornada.json`:
 
 O save anterior fica em `jornada.anterior.json`. A importação não modifica o save do terminal.
 O formato JSON é unidirecional: a versão antiga de terminal não lê o novo save.
-O marcador diário da charada do formato legado 2 não é usado na prévia gráfica, que ainda não
-contém esse minijogo.
+O formato JSON atual é o **4**, que preserva a tentativa diária da charada. Saves JSON
+anteriores (formato 3, das alphas 1 e 2) continuam sendo lidos e começam com a tentativa
+disponível, pois não guardavam esse campo. A importação do terminal preserva o marcador
+diário original. Saves gravados pela alpha 3 não são lidos pelas alphas anteriores;
+a cópia `jornada.anterior.json` preserva o arquivo anterior à última gravação.
 
 ### Testes e distribuição
 
