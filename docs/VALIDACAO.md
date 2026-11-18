@@ -17,7 +17,12 @@ distribuição e inicia o jogo pelo script distribuído (`super-rpg.bat` ou `sup
 O roteiro `--smoke` cria um personagem com semente reproduzível, abre as sete abas dos
 serviços, realiza uma cura, confere o débito de ouro, responde uma charada, joga dados,
 ouve um rumor, viaja, resolve o encontro com um viajante e entra em combate.
-Ele ataca e captura a janela reduzida, inclusive a taverna. O Linux utiliza uma tela virtual Xvfb.
+Ele ataca e captura a janela reduzida, inclusive a taverna. Em uma nova sessão, abre
+moradores, conversa com Mira, aceita uma missão e encerra a conversa. A captura final é
+`24-conversa-concluida.png`. O Linux utiliza uma tela virtual Xvfb.
+
+Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
+reinício da subida, derrota, restrição de save e recompensa única das conversas.
 
 A última captura é obrigatória para a execução ser considerada concluída. Relatórios
 JUnit e capturas são guardados como artefatos por 14 dias, inclusive quando há falhas.

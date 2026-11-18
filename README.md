@@ -3,7 +3,7 @@
 ## Versões
 
 - **v1.0.0:** aventura original completa no terminal, preservada na tag `v1.0.0`.
-- **v2.0.0-alpha.3:** prévia gráfica em JavaFX com serviços, eventos de exploração e minijogos. A branch `main` reúne o desenvolvimento
+- **v2.0.0-alpha.4:** prévia gráfica em JavaFX com serviços, exploração, minijogos, moradores e pausas na torre. A branch `main` reúne o desenvolvimento
   atual da interface. Ainda está em desenvolvimento e não possui todos os sistemas da v1.
 
 Consulte o [histórico de versões](CHANGELOG.md) e as
@@ -26,11 +26,13 @@ Já disponíveis na interface:
 - Custos, chances da forja e ingredientes faltantes visíveis, com confirmação de ações relevantes.
 - Exploração com combates, baús, armadilhas, fogueiras, fonte mística e encontros com escolhas.
 - Dados com Gus, rumores e uma tentativa de charada por dia do jogo, preservada no save.
+- Conversas com os cinco moradores, com missões e pré-requisitos por personagem.
+- Pausas na torre para usar itens, equipar e decidir entre continuar ou descer.
 - Histórico de eventos, números flutuantes de dano/cura e opção de animações rápidas.
 - Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato interno 2
   do save legado. Esse número pertence ao formato do arquivo e não à versão pública do jogo.
 
-Ainda pendentes: diálogos completos de NPCs, pausas entre andares da torre, ranking gráfico,
+Ainda pendentes: revisão narrativa da campanha completa, ranking gráfico,
 áudio, animações completas e instaladores com Java embutido.
 **Explorar os arredores** segue a distribuição original: 40% combate, 10% baú, 10% armadilha,
 10% fogueira e 30% encontro narrativo (viajante, santuário, cofre, mercador ou fonte).
@@ -47,6 +49,16 @@ Na aba **Jogos e rumores**, aposte de 1 a 100 ouro nos dados, ouça Gus ou aceit
 charada. A tentativa é consumida ao aceitar, mesmo se desistir. Ela só é liberada no
 próximo dia do jogo; a resposta correta concede 30–69 ouro e 40 XP. O jogo de dados
 não avança o relógio e o empate não altera seu saldo.
+
+Em **Missões → Moradores**, converse com Mira, Lira, Borin, Aldric ou Gus. Cada conversa
+mostra as missões daquele personagem. Aceitar e entregar exigem confirmação pelo botão
+correspondente; o diário continua oferecendo os mesmos atalhos. Aldric conversa a partir
+do nível 4. A conversa não avança o tempo.
+
+Após vencer cada um dos dois primeiros andares da torre, confirme a recompensa para
+abrir a pausa. Você pode usar a mochila, trocar equipamentos, continuar ou descer.
+Descer mantém recompensas, mas reinicia a próxima subida no primeiro andar. A pausa
+não avança o relógio; salvar só é permitido depois de descer ou concluir a torre.
 
 ### Executar a interface
 
