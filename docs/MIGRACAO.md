@@ -9,8 +9,9 @@ A entrega `v2.0.0-alpha.2` completa os serviços da vila e acrescenta validaçã
 automatizada em Windows, macOS e Linux com Java 21 e 26.
 A entrega `v2.0.0-alpha.3` migra eventos de exploração, dados, rumores e charada diária.
 A entrega `v2.0.0-alpha.4` acrescenta moradores e pausas entre andares da torre.
-A entrega atual, `v2.0.0-alpha.5`, corrige o descanso após emboscada e testa a progressão
+A entrega `v2.0.0-alpha.5` corrige o descanso após emboscada e testa a progressão
 controlada nas cinco classes. A campanha jogada normalmente ainda não foi validada por completo.
+A entrega atual, `v2.0.0-alpha.6`, acrescenta aplicativos portáteis com runtime incluído.
 
 As tags publicadas são imutáveis. Correções recebem incremento de patch, recursos compatíveis
 incrementam minor e novas prévias avançam o sufixo (`alpha.2`, `beta.1`) até a versão `v2.0.0`
@@ -55,6 +56,7 @@ paridade de todos os sistemas nem acabamento artístico final.
 - [x] Dados, rumores e charada diária com persistência do limite.
 - [x] Conversas dos cinco moradores com missões e bloqueio de Aldric por nível.
 - [x] Pausas entre andares da torre, mochila e retirada voluntária.
+- [x] Geração e roteiro de validação de aplicativos nativos com runtime incluído.
 - [ ] Paridade completa com o terminal.
 - [ ] Arte final, áudio, efeitos avançados e instaladores independentes de Java.
 
@@ -70,7 +72,8 @@ paridade de todos os sistemas nem acabamento artístico final.
 5. Refinar personagens, cenários e animações: movimento de ataque, projéteis, crítico, impacto,
    barras animadas, morte, level up e sinalização de turnos. Adicionar áudio com licenças registradas.
 6. Ranking, opções persistentes, acessibilidade e conferência manual Windows/Linux.
-7. Empacotar com runtime Java usando `jpackage`; documentar assinatura e distribuição por plataforma.
+7. Sobre os aplicativos portáteis já gerados com `jpackage`, criar instaladores, definir
+   ícones finais e tratar assinatura/notarização. Conferir abertura em máquinas de jogadores.
 
 ## Regras preservadas e diferenças explícitas
 

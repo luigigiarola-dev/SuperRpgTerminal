@@ -53,6 +53,47 @@ jobs:
       - name: Confirmar conclusão do roteiro gráfico
         shell: bash
         run: test -s build/screenshots/24-conversa-concluida.png
+      - name: Gerar aplicativo com runtime (Windows)
+        if: matrix.java == '21' && runner.os == 'Windows'
+        run: .\gradlew.bat --no-daemon packageBundle
+      - name: Gerar aplicativo com runtime (macOS/Linux)
+        if: matrix.java == '21' && runner.os != 'Windows'
+        run: ./gradlew --no-daemon packageBundle
+      - name: Validar aplicativo nativo (Windows)
+        if: matrix.java == '21' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/native-smoke, build/packages | Out-Null
+          $env:JAVA_HOME = 'C:\java-nao-instalado'
+          $exe = (Resolve-Path build/native/SuperRPG/SuperRPG.exe).Path
+          $processo = Start-Process -FilePath $exe -ArgumentList '--smoke' -WorkingDirectory build/native-smoke -Wait -PassThru
+          if ($processo.ExitCode -ne 0) { throw "Aplicativo encerrou com erro: $($processo.ExitCode)" }
+          if (!(Test-Path build/native-smoke/build/screenshots/24-conversa-concluida.png)) { throw 'Roteiro nativo incompleto' }
+          Compress-Archive -Path build/native/* -DestinationPath "build/packages/SuperRPG-Windows-$env:RUNNER_ARCH.zip"
+      - name: Validar aplicativo nativo (macOS)
+        if: matrix.java == '21' && runner.os == 'macOS'
+        run: |
+          mkdir -p build/native-smoke build/packages
+          app="$PWD/build/native/SuperRPG.app/Contents/MacOS/SuperRPG"
+          (cd build/native-smoke && JAVA_HOME=/java-nao-instalado "$app" --smoke)
+          test -s build/native-smoke/build/screenshots/24-conversa-concluida.png
+          ditto -c -k --sequesterRsrc build/native "build/packages/SuperRPG-macOS-$RUNNER_ARCH.zip"
+      - name: Validar aplicativo nativo (Linux)
+        if: matrix.java == '21' && runner.os == 'Linux'
+        run: |
+          mkdir -p build/native-smoke build/packages
+          app="$PWD/build/native/SuperRPG/bin/SuperRPG"
+          (cd build/native-smoke && JAVA_HOME=/java-nao-instalado xvfb-run -a -s '-screen 0 1440x1000x24' "$app" --smoke)
+          test -s build/native-smoke/build/screenshots/24-conversa-concluida.png
+          tar -czf "build/packages/SuperRPG-Linux-$RUNNER_ARCH.tar.gz" -C build/native SuperRPG documentacao
+      - name: Guardar aplicativos validados
+        if: matrix.java == '21'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: aplicativo-${{ runner.os }}-${{ runner.arch }}
+          path: build/packages/*
+          retention-days: 14
+          if-no-files-found: error
       - name: Guardar relatórios e capturas
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -62,5 +103,6 @@ jobs:
             build/reports/tests/test/
             build/test-results/test/
             build/screenshots/
+            build/native-smoke/build/screenshots/
           retention-days: 14
           if-no-files-found: warn
