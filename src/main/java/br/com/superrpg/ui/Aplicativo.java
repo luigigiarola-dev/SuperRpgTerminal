@@ -29,6 +29,7 @@ public final class Aplicativo extends Application {
     private String ultimoResultado = "";
     private StackPane arena;
     private String nomeHeroi = "";
+    private int abaVila;
     private boolean modoHardcore;
     private final Salvamento salvamento = Salvamento.padrao();
 
@@ -129,7 +130,7 @@ public final class Aplicativo extends Application {
             case "Mapa" -> mapa(s);
             case "Mochila" -> inventario(s);
             case "Missões" -> opcoes("O diário da sua jornada", "Aceite e entregue missões ao visitar a vila.",s.missoes(),MISSAO);
-            case "Mercador" -> opcoes("O estoque de Tobias",s.periodo().equals("Noite")||s.periodo().equals("Madrugada")?"O mercado está fechado. Descanse até a manhã.":"Suprimentos e equipamentos. Sua honra influencia os preços.",s.loja(),COMPRAR);
+            case "Serviços" -> servicos(s);
             default -> jornada(s);
         };
         VBox.setVgrow(corpo,Priority.ALWAYS);centro.getChildren().add(corpo);
@@ -143,9 +144,9 @@ public final class Aplicativo extends Application {
         VBox v=new VBox(8);v.getStyleClass().add("sidebar");v.setPrefWidth(208);v.setPadding(new Insets(24,18,18,18));
         v.getChildren().addAll(texto("SUPER RPG","brand"),texto("CRÔNICAS DE AURORA","tiny"),new Separator());
         boolean combate=s.fase()==EstadoJogo.Fase.COMBATE;
-        for(String p:List.of("Jornada","Mapa","Mochila","Missões","Mercador")) {
+        for(String p:List.of("Jornada","Mapa","Mochila","Missões","Serviços")) {
             Button b=botao(p,p.equals(pagina)?"nav-active":"nav",()->{pagina=p;renderizar();});
-            b.setDisable(s.talentos()>0 || (s.fase()!=EstadoJogo.Fase.EXPLORACAO && !(combate && p.equals("Mochila")) && !p.equals("Jornada")) || p.equals("Mercador")&&!s.localId().equals("VILA"));
+            b.setDisable(s.talentos()>0 || (s.fase()!=EstadoJogo.Fase.EXPLORACAO && !(combate && p.equals("Mochila")) && !p.equals("Jornada")) || (p.equals("Mercador")||p.equals("Serviços"))&&!s.localId().equals("VILA"));
             v.getChildren().add(b);
         }
         v.getChildren().add(espaco());
@@ -217,17 +218,59 @@ public final class Aplicativo extends Application {
         VBox.setVgrow(v.getChildren().getLast(),Priority.ALWAYS);return v;
     }
     private Node opcoes(String titulo,String subtitulo,List<EstadoJogo.Opcao> lista,AcaoJogo.Tipo tipo) {
+        return opcoes(titulo,subtitulo,lista,tipo,true);
+    }
+    private Node opcoes(String titulo,String subtitulo,List<EstadoJogo.Opcao> lista,AcaoJogo.Tipo tipo,boolean rolagem) {
         VBox v=coluna(texto(titulo,"card-title"),texto(subtitulo,"muted"));
         VBox itens=new VBox(10);
         if(lista.isEmpty())itens.getChildren().add(texto("Nada por aqui ainda.","intro"));
         for(var o:lista) {
             VBox descricao=new VBox(5,texto(o.nome(),"card-title"),texto(o.descricao(),"muted"));HBox.setHgrow(descricao,Priority.ALWAYS);
             boolean eq=tipo==ITEM&&o.descricao().startsWith("Equipamento");
-            Button b=botao(tipo==COMPRAR?"Comprar":tipo==MISSAO?(o.descricao().startsWith("Entregar")?"Entregar":"Aceitar"):eq?"Equipar":"Usar","secondary",()->agir(new AcaoJogo(eq?EQUIPAR:tipo,o.id())));
+            String rotulo=switch(tipo) {
+                case COMPRAR -> "Comprar"; case VENDER -> "Vender"; case MELHORAR -> "Melhorar";
+                case CRIAR -> "Criar"; case CURAR -> "Receber cura"; case DOAR -> "Doar";
+                case CONTRATAR -> "Contratar"; case DISPENSAR -> "Dispensar"; case DESCANSAR -> "Descansar";
+                case MISSAO -> o.descricao().startsWith("Entregar")?"Entregar":"Aceitar";
+                default -> eq?"Equipar":"Usar";
+            };
+            Button b=botao(rotulo,"secondary",()->{
+                AcaoJogo acao=new AcaoJogo(eq?EQUIPAR:tipo,o.id());
+                if(List.of(VENDER,MELHORAR,DOAR,CONTRATAR,DISPENSAR).contains(tipo)) confirmarServico(rotulo,o,acao);
+                else agir(acao);
+            });
             b.setDisable(!o.disponivel());b.setMinWidth(104);
             HBox card=linha(descricao,b);card.getStyleClass().add("item-card");itens.getChildren().add(card);
         }
+        if(!rolagem){v.getChildren().add(itens);v.setMinHeight(Region.USE_PREF_SIZE);return v;}
         ScrollPane scroll=new ScrollPane(itens);scroll.setFitToWidth(true);VBox.setVgrow(scroll,Priority.ALWAYS);v.getChildren().add(scroll);return v;
+    }
+    private Node secoes(Node... secoes) {
+        VBox conteudo=new VBox(22,secoes);conteudo.setPadding(new Insets(0,8,12,0));
+        ScrollPane scroll=new ScrollPane(conteudo);scroll.setFitToWidth(true);return scroll;
+    }
+    private Node servicos(EstadoJogo s) {
+        var vila=s.vila();
+        TabPane abas=new TabPane();abas.setMinHeight(0);abas.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        Node templo=secoes(opcoes("Bênção", "O templo acolhe a todos, a qualquer hora.",vila.cura(),CURAR,false),
+                opcoes("Generosidade", "A doação não recebe desconto por honra.",vila.doacao(),DOAR,false));
+        Node taverna=secoes(opcoes("Repouso", "Um teto para recuperar as forças.",vila.descanso(),DESCANSAR,false),
+                opcoes("Companhia", "Aliado atual: "+vila.aliadoAtual(),vila.aliados(),CONTRATAR,false),
+                opcoes("Seguir sozinho", "A dispensa não devolve o ouro da contratação.",vila.dispensa(),DISPENSAR,false));
+        abas.getTabs().addAll(new Tab("Compra",opcoes("O estoque de Tobias",s.periodo().equals("Noite")||s.periodo().equals("Madrugada")?"O mercado está fechado. Descanse até a manhã.":"Suprimentos e equipamentos. Sua honra influencia os preços.",s.loja(),COMPRAR)),
+                new Tab("Venda",opcoes("Negociar com Tobias","Apenas itens da mochila. Itens de missão não podem ser vendidos.",vila.vendas(),VENDER)),
+                new Tab("Forja",opcoes("A forja de Borin","Melhore a arma ou armadura equipada até +5.",vila.forja(),MELHORAR)),
+                new Tab("Alquimia",opcoes("O laboratório de Mara","Os ingredientes são consumidos somente quando a receita está completa.",vila.receitas(),CRIAR)),
+                new Tab("Templo",templo),new Tab("Taverna",taverna));
+        abas.getSelectionModel().select(abaVila);
+        abas.getSelectionModel().selectedIndexProperty().addListener((o,a,b)->abaVila=b.intValue());
+        VBox v=coluna(texto("Os serviços de Aurora","heading"),abas);VBox.setVgrow(abas,Priority.ALWAYS);return v;
+    }
+    private void confirmarServico(String titulo,EstadoJogo.Opcao opcao,AcaoJogo acao) {
+        Alert alerta=new Alert(Alert.AlertType.CONFIRMATION,opcao.descricao(),ButtonType.CANCEL,ButtonType.OK);
+        alerta.initOwner(janela);alerta.setHeaderText(titulo+": "+opcao.nome());
+        alerta.getDialogPane().getStylesheets().add(getClass().getResource("/tema.css").toExternalForm());
+        if(alerta.showAndWait().orElse(ButtonType.CANCEL)==ButtonType.OK)agir(acao);
     }
     private Node talentos(EstadoJogo s) {
         VBox v=coluna(texto("SEU PODER DESPERTA", "eyebrow"),texto("Uma nova força. Uma escolha.","heading"),texto("Nível "+s.heroi().nivel()+" · "+s.talentos()+" talento(s) para escolher","muted"));
@@ -299,7 +342,16 @@ public final class Aplicativo extends Application {
         List<Runnable> passos=List.of(
             ()->{snapshot("01-titulo");clicar("NOVA JORNADA   →");},
             ()->{snapshot("02-criacao");((TextField)raiz.lookup(".text-field")).setText("Arthur");clicar("ENTRAR EM AURORA   →");},
-            ()->{snapshot("03-vila");clicar("EXPLORAR O MAPA   →");},
+            ()->{snapshot("03-vila");clicar("Serviços");},
+            ()->{snapshot("14-compra");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(1);},
+            ()->{snapshot("08-venda");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(2);},
+            ()->{snapshot("09-forja");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(3);},
+            ()->{snapshot("10-alquimia");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(4);},
+            ()->{snapshot("11-templo");clicar("Receber cura");
+                if(jogo.estado().ouro()!=50)throw new IllegalStateException("Cura não foi debitada corretamente.");
+                ((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(5);},
+            ()->{snapshot("12-taverna");janela.setWidth(1024);janela.setHeight(720);},
+            ()->{snapshot("13-taverna-compacta");clicar("Jornada");clicar("EXPLORAR O MAPA   →");},
             ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));if(jogo.estado().fase()==EstadoJogo.Fase.EXPLORACAO)clicar("PROCURAR UM CONFRONTO");},
             ()->{snapshot("05-combate");clicar("1  Atacar");},
             ()->{snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},

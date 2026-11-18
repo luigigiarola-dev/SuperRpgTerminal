@@ -74,6 +74,7 @@ public final class MotorJogo {
                 if (indiceValido(a.indice(), heroi.inv.size()) && heroi.inv.get(a.indice()) instanceof Equipamento e) heroi.equipar(e);
             }
             case COMPRAR -> comprar(a.indice());
+            case VENDER, MELHORAR, CRIAR, CURAR, DOAR, CONTRATAR, DISPENSAR -> new ServicosVila(this, sorte).executar(a);
             default -> { }
         }
     }
@@ -250,8 +251,8 @@ public final class MotorJogo {
         if (heroi.gastarOuro(preco(item.getPreco()))) { heroi.inv.add(item); Eventos.texto("Comprado: " + item.getNome()); }
         else Eventos.texto("Ouro insuficiente.");
     }
-    private int preco(int base) { return Math.max(1, (int)Math.round(base * (heroi.honra >= 2 ? .9 : heroi.honra <= -2 ? 1.15 : 1))); }
-    private boolean noite() { return periodo >= 2; }
+    int preco(int base) { return Math.max(1, (int)Math.round(base * (heroi.honra >= 2 ? .9 : heroi.honra <= -2 ? 1.15 : 1))); }
+    boolean noite() { return periodo >= 2; }
     private void avancar() {
         periodo = (periodo + 1) % 4; if (periodo == 0) dia++;
         heroi.curar(5); heroi.modificarMana(8);
@@ -287,7 +288,8 @@ public final class MotorJogo {
         List<String> eq = Arrays.stream(heroi.equip).map(e -> e == null ? "Vazio" : e.getNome() + " · " + e.getDescricao()).toList();
         return new EstadoJogo(fase, personagem(heroi), inimigo == null ? null : personagem(inimigo), heroi.getClasse(), local.nome, local.name(),
                 dia, SuperRpgTerminal.PERIODOS[periodo], heroi.ouro, heroi.xp, heroi.xpProximo(), heroi.honra, heroi.talentosPendentes, hardcore, rodada,
-                List.copyOf(hs), List.copyOf(inv), List.copyOf(locais), List.copyOf(ms), List.copyOf(loja), eq);
+                List.copyOf(hs), List.copyOf(inv), List.copyOf(locais), List.copyOf(ms), List.copyOf(loja), eq,
+                new ServicosVila(this, sorte).estado());
     }
     private Personagem personagem(Entidade e) {
         String afinidades = e.afinidade.entrySet().stream().map(a -> a.getKey().nome + " ×" + a.getValue()).reduce((a,b) -> a + " · " + b).orElse("Sem afinidades especiais");
