@@ -48,8 +48,12 @@ Os testes controlados de progressão não substituem jogar partidas completas.
 
 ## Diversão e ritmo como critérios de qualidade
 
-Efeitos devem ajudar a entender e sentir as ações sem prolongar desnecessariamente os turnos.
-Reações de impacto são curtas, paralelas aos números flutuantes e dispensáveis no modo rápido.
+Entretenimento e decisões interessantes têm prioridade sobre a duração mínima do turno.
+Um turno mais longo é válido quando sua preparação, impacto e consequência sustentam a atenção;
+o objetivo é evitar repetição e espera sem significado, não acelerar tudo.
+Golpes importantes e chefes podem receber maior destaque, enquanto ações comuns pedem variação
+e legibilidade. As reações simples atuais são curtas e paralelas aos números flutuantes;
+isso não impõe um limite de duração às futuras animações. O modo rápido permanece opcional.
 Nas campanhas jogadas, avaliar tempo entre decisões, repetição de encontros, utilidade real
 das habilidades, dificuldade dos chefes e sensação de progresso. Testes automáticos não
 comprovam diversão; ajustar regras e balanceamento exige evidência de jogo e registro das mudanças.
