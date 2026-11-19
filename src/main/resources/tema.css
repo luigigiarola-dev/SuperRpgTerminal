@@ -64,3 +64,4 @@
 .spinner { -fx-background-color: #15262d; }
 .spinner .increment-arrow-button, .spinner .decrement-arrow-button { -fx-background-color: #34433d; }
 .spinner .increment-arrow, .spinner .decrement-arrow { -fx-background-color: #e1c68a; }
+.story-panel { -fx-background-color: rgba(16, 28, 34, 0.96); -fx-border-color: #766645; -fx-border-radius: 6; -fx-background-radius: 6; }

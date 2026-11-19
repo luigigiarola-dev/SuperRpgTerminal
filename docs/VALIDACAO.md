@@ -19,10 +19,19 @@ serviços, realiza uma cura, confere o débito de ouro, responde uma charada, jo
 ouve um rumor, viaja, resolve o encontro com um viajante e entra em combate.
 Ele ataca e captura a janela reduzida, inclusive a taverna. Em uma nova sessão, abre
 moradores, conversa com Mira, aceita uma missão e encerra a conversa. A captura final é
-`24-conversa-concluida.png`. O Linux utiliza uma tela virtual Xvfb.
+`30-retorno-menu.png`. Também percorre o prólogo completo e sua opção de pular,
+e captura vitória e derrota em janela compacta com dados fixos de apresentação.
+Esses dados não simulam vencer a campanha: a transição real e o resumo são cobertos
+nos testes de regras. O Linux utiliza uma tela virtual Xvfb.
 
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.
+Também verificam os limites de honra dos três epílogos, a pontuação original,
+a ausência de encerramento após derrota Normal e o encerramento Hardcore.
+
+A validação da alpha 6 na `main` passou nas seis combinações:
+[execução 44411202298](https://github.com/luigigiarola-dev/SuperRpgTerminal/actions/runs/44411202298).
+A falha anterior ao resolver dependências no Linux/Java 26 não se repetiu nessa execução.
 
 Nas três combinações com Java 21, a automação também gera o aplicativo nativo com
 `packageBundle` e executa seu lançador com `--smoke`. Usa uma pasta de trabalho nova

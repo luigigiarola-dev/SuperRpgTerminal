@@ -70,6 +70,8 @@ class CampanhaTest {
         agir(j,VIAJAR,6);assertEquals(Local.COVIL,j.local);j=checkpoint(j,pasta.resolve("jornada.json"));
         agir(j,EXPLORAR,0);assertInstanceOf(DragaoAncestral.class,j.inimigo);vencer(j);
         assertEquals(VITORIA,j.fase);assertEquals(10,j.diario.entregues());
+        var fim=j.encerramento().orElseThrow();assertTrue(fim.venceu());
+        assertEquals(classe,fim.classe());assertEquals(10,fim.missoes());
         var finalizado=j.estado();agir(j,CONTINUAR,0);agir(j,MISSAO,9);assertEquals(finalizado,j.estado());
     }
 

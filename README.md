@@ -9,6 +9,10 @@
 Consulte o [histórico de versões](CHANGELOG.md) e as
 [versões publicadas no GitHub](https://github.com/luigigiarola-dev/SuperRpgTerminal/releases).
 
+Na próxima prévia (`2.0.0-alpha.7-SNAPSHOT`, código em desenvolvimento): prólogo,
+epílogos por honra, resumo e pontuação da campanha. Esses recursos ainda não estão
+nos aplicativos da release alpha 6; os downloads publicados permanecem inalterados.
+
 ## Interface gráfica — primeira etapa da migração
 
 A versão desktop usa **JavaFX**, com tema de fantasia,
