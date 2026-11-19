@@ -9,6 +9,13 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 
 ## Em desenvolvimento — próxima prévia
 
+- Objetivo sugerido visível na exploração: primeiro contato, progresso, local de busca
+  e retorno para entrega. Não aceita nem entrega missões automaticamente.
+- Três habilidades acessíveis diretamente no combate, com custo/elemento e motivos
+  de indisponibilidade. Ordem de ação e benefício de defender mais claros.
+- Aviso específico de cada chefe durante a carga, sem prever decisões aleatórias futuras.
+- Roteiro de avaliação dos primeiros minutos, motivado por relato de monotonia e falta de direção.
+
 - Recuo curto ao receber dano/bloqueio e deslocamento maior na esquiva, para herói e inimigo.
   As reações acompanham os números flutuantes sem aumentar a duração da fila existente;
   o modo rápido pula os efeitos. Cenário e regras permanecem inalterados.

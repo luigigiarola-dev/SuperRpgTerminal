@@ -250,12 +250,25 @@ public final class Aplicativo extends Application {
         Cenario cena=new Cenario(s.localId(),s.classe(),s.inimigo()==null?null:s.inimigo().tipo(),!s.periodo().equals("Manhã")&&!s.periodo().equals("Tarde"));
         arena=new StackPane(cena);arena.getStyleClass().add("arena");VBox.setVgrow(arena,Priority.ALWAYS);
         if(combate && s.inimigo().carregando()) {
-            Label aviso=texto("GOLPE CARREGADO  ·  Defenda-se ou atordoe o inimigo", "boss-warning");StackPane.setAlignment(aviso,Pos.TOP_CENTER);StackPane.setMargin(aviso,new Insets(14));arena.getChildren().add(aviso);
+            Label aviso=texto(jogo.taticaCombate().orElseThrow().ameaca(), "boss-warning");StackPane.setAlignment(aviso,Pos.TOP_CENTER);StackPane.setMargin(aviso,new Insets(14));arena.getChildren().add(aviso);
         }
         v.getChildren().add(arena);
         if(combate) {
             HBox fichas=linha(fichaCombate(s.heroi()),espaco(),fichaCombate(s.inimigo()));v.getChildren().add(fichas);
-            FlowPane acoes=new FlowPane(12,10,botao("1  Atacar","primary",()->agir(AcaoJogo.de(ATACAR))),botao("2  Habilidade","secondary",this::habilidades),botao("3  Defender","secondary",()->agir(AcaoJogo.de(DEFENDER))),
+            var tatica=jogo.taticaCombate().orElseThrow();
+            v.getChildren().add(texto(tatica.ordem()+" · 2: detalhes das habilidades","tiny"));
+            HBox habilidades=new HBox(10);
+            for(var h:tatica.habilidades()) {
+                String estado=h.custo()+" MP · "+h.elemento()+(h.disponivel()?"":"\n"+h.indisponibilidade());
+                Button b=botao(h.nome()+"\n"+estado,"combat-skill",()->agir(new AcaoJogo(HABILIDADE,h.id())));
+                b.setId("habilidade-rapida-"+h.id());b.setWrapText(true);b.setPrefWidth(0);b.setMinHeight(64);
+                b.setDisable(!h.disponivel());b.setTooltip(new Tooltip(h.descricao()+"\nCusto: "+h.custo()+" MP · "+h.elemento()));
+                HBox.setHgrow(b,Priority.ALWAYS);habilidades.getChildren().add(b);
+            }
+            v.getChildren().add(habilidades);
+            Button defender=botao("3  Defender · +8 MP",s.inimigo().carregando()?"primary":"secondary",()->agir(AcaoJogo.de(DEFENDER)));
+            defender.setTooltip(new Tooltip(tatica.defesa()));
+            FlowPane acoes=new FlowPane(12,10,botao("1  Atacar","secondary",()->agir(AcaoJogo.de(ATACAR))),defender,
                     botao("Mochila","secondary",()->{pagina="Mochila";renderizar();}),botao("Analisar","ghost",()->mensagem(s.inimigo().nome(),s.inimigo().afinidades()+"\nAtaque "+s.inimigo().ataque()+" · Defesa "+s.inimigo().defesa()+" · Agilidade "+s.inimigo().agilidade())),
                     botao("Fugir","ghost",()->agir(AcaoJogo.de(FUGIR))));
             v.getChildren().add(acoes);
@@ -269,11 +282,10 @@ public final class Aplicativo extends Application {
             v.getChildren().add(texto(ultimoResultado,"intro"));
             v.getChildren().add(s.fase()==EstadoJogo.Fase.RECOMPENSA?botao("CONTINUAR   →","primary",()->agir(AcaoJogo.de(CONTINUAR))):botao("VOLTAR AO MENU","primary",()->{jogo=null;titulo();}));
         } else {
-            String frase=s.localId().equals("VILA")?"Há luz nas janelas e rumores na taverna. Prepare-se antes de partir.":"O caminho guarda perigos. Observe seus recursos e escolha seu próximo passo.";
-            v.getChildren().add(texto(frase,"muted"));
+            v.getChildren().add(coluna(texto("PRÓXIMO PASSO · SUGESTÃO","eyebrow"),texto(jogo.objetivoAtual(),"muted")));
             HBox acoes=new HBox(12);
             if(s.localId().equals("VILA")) {
-                acoes.getChildren().addAll(botao("EXPLORAR O MAPA   →","primary",()->{pagina="Mapa";renderizar();}),botao("Moradores e missões","secondary",()->{pagina="Missões";renderizar();}),botao("Descansar na taverna","secondary",()->agir(AcaoJogo.de(DESCANSAR))));
+                acoes.getChildren().addAll(botao("Moradores e missões","primary",()->{pagina="Missões";renderizar();}),botao("EXPLORAR O MAPA   →","secondary",()->{pagina="Mapa";renderizar();}),botao("Descansar na taverna","secondary",()->agir(AcaoJogo.de(DESCANSAR))));
             } else {
                 acoes.getChildren().add(botao(s.localId().equals("COVIL")?"ENFRENTAR IGNIS":s.localId().equals("TORRE")?"SUBIR A TORRE":"EXPLORAR OS ARREDORES","primary",()->agir(AcaoJogo.de(EXPLORAR))));
                 if(!List.of("TORRE","COVIL").contains(s.localId())) acoes.getChildren().addAll(botao("Coletar recursos","secondary",()->agir(AcaoJogo.de(COLETAR))),botao("Acampar","secondary",()->agir(AcaoJogo.de(ACAMPAR))));
@@ -525,7 +537,11 @@ public final class Aplicativo extends Application {
             ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));clicar("EXPLORAR OS ARREDORES");},
             ()->{snapshot("20-viajante");clicar("Seguir caminho");},
             ()->{snapshot("21-escolha");clicar("Continuar jornada");clicar("EXPLORAR OS ARREDORES");},
-            ()->{snapshot("05-combate");rapido=false;clicar("1  Atacar");
+            ()->{snapshot("05-combate");rapido=false;
+                for(int i=0;i<3;i++)if(!(raiz.lookup("#habilidade-rapida-"+i) instanceof Button))throw new IllegalStateException("Habilidade não está visível no combate.");
+                Button habilidade=(Button)raiz.lookup("#habilidade-rapida-0");
+                if(habilidade.isDisabled())throw new IllegalStateException("Habilidade inicial indisponível.");
+                habilidade.fire();
                 if(!animando||!raiz.isDisabled())throw new IllegalStateException("Fila visual não bloqueou a entrada.");
                 var antes=jogo.estado();agir(AcaoJogo.de(ATACAR));
                 if(!antes.equals(jogo.estado()))throw new IllegalStateException("Comando extra durante animação.");},

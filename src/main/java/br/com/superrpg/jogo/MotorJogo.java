@@ -44,6 +44,43 @@ public final class MotorJogo {
 
     public List<HistoriaCampanha.Fala> introducao() { return HistoriaCampanha.introducao(heroi); }
 
+    /** Orientação consultiva: não aceita nem entrega missões automaticamente. */
+    public String objetivoAtual() {
+        for(Missao m:diario.missoes)if(m.pronta(heroi))
+            return m.titulo+" — objetivo cumprido. Volte à vila e entregue a missão a "+m.doador+" pelo diário ou pela conversa.";
+        for(Missao m:diario.missoes)if(m.estado==1) {
+            String destino=switch(m.id) {
+                case "praga","lobos","ervas","ladrao" -> Local.FLORESTA.nome;
+                case "teias" -> Local.CAVERNA.nome;
+                case "ossos","seita" -> Local.RUINAS.nome;
+                case "fogo" -> Local.MONTANHA.nome;
+                case "torre" -> Local.TORRE.nome;
+                default -> Local.COVIL.nome;
+            };
+            String atividade=m.tipo==Missao.Tipo.COLETAR?"Colete recursos em ":"Explore ";
+            return m.titulo+" — "+m.objetivo(heroi)+". "+atividade+destino+". Recompensa: "+m.recompensa()+".";
+        }
+        for(Missao m:diario.missoes)if(disponivel(m))
+            return "Fale com "+m.doador+" na vila para aceitar “"+m.titulo+"”. Abra Moradores e missões para começar.";
+        return "Consulte o diário para ver os requisitos das próximas missões. Explore áreas adequadas ao seu nível e prepare seus equipamentos.";
+    }
+
+    public Optional<TaticaCombate> taticaCombate() {
+        if(fase!=Fase.COMBATE)return Optional.empty();
+        List<TaticaCombate.Habilidade> habilidades=new ArrayList<>();
+        for(int i=0;i<heroi.habilidades().size();i++) {
+            Habilidade h=heroi.habilidades().get(i);int recarga=heroi.recargas.getOrDefault(h.nome,0);
+            List<String> motivos=new ArrayList<>();
+            if(recarga>0)motivos.add("Recarga: "+recarga);
+            if(heroi.mana<h.custo)motivos.add("Faltam "+(h.custo-heroi.mana)+" MP");
+            habilidades.add(new TaticaCombate.Habilidade(i,h.nome,h.desc,h.elem.nome,h.custo,recarga,String.join(" · ",motivos)));
+        }
+        return Optional.of(new TaticaCombate(
+            heroiPrimeiro?"Ordem desta rodada: você → inimigo":"Ordem desta rodada: inimigo → você",
+            "Defender reduz o dano em guarda e recupera até 8 MP, além da regeneração normal de 4 MP por ação.",
+            inimigo.carregando?inimigo.aviso()+" Defenda-se ou interrompa com atordoamento.":"",habilidades));
+    }
+
     public Optional<HistoriaCampanha.Encerramento> encerramento() {
         if (fase != Fase.VITORIA && fase != Fase.DERROTA) return Optional.empty();
         return Optional.of(HistoriaCampanha.encerrar(heroi, diario, dia, hardcore, fase == Fase.VITORIA));

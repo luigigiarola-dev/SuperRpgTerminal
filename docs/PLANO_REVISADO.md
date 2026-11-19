@@ -39,6 +39,9 @@ O ranking passou em 111 testes e no roteiro gráfico das seis combinações de s
    guarda, escudo e esquiva integrados pela revisão #10. Recuo e esquiva dos personagens
    estão em validação separada. Avanço de ataque, barras suaves e ícones próprios seguem pendentes.
 3. Conferir ficha de atributos e interação das telas compactas; avançar na apresentação do mundo.
+   A avaliação dos primeiros minutos ganhou prioridade após relato de monotonia e falta de
+   objetivo claro. Orientação de missão e habilidades visíveis estão na revisão de escolhas;
+   avaliar o efeito com o roteiro `PLAYTEST_INICIAL.md`, sem presumir diversão pelos testes automáticos.
 4. Consolidar opções, áudio e arte com licenças registradas.
 5. Publicar a próxima prévia somente com os pacotes correspondentes validados.
 
