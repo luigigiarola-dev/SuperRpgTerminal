@@ -476,6 +476,7 @@ public final class Aplicativo extends Application {
             e.tipo()==EventoJogo.Tipo.ESQUIVA||e.tipo()==EventoJogo.Tipo.BLOQUEIO?"defense-number":"damage-number";
         var impacto=e.impacto();
         if(impacto!=null) {
+            if(e.tipo()==EventoJogo.Tipo.DANO)estilo="impact-number";
             List<String> detalhes=new ArrayList<>();
             if(impacto.critico()) { detalhes.add("CRÍTICO");estilo="critical-number"; }
             if(impacto.afinidade()>1)detalhes.add("FRAQUEZA · "+impacto.elemento());
@@ -485,7 +486,8 @@ public final class Aplicativo extends Application {
             if(!detalhes.isEmpty())rotulo+="\n"+String.join("\n",detalhes);
         }
         Label label=texto(rotulo,estilo);label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-        label.setAlignment(Pos.CENTER);label.setMouseTransparent(true);return label;
+        label.setAlignment(Pos.CENTER);label.setMaxWidth(360);label.setMinHeight(Region.USE_PREF_SIZE);
+        label.setMouseTransparent(true);return label;
     }
 
     /** Teste visual reproduzível sem alterar saves nem configurações do usuário. */
