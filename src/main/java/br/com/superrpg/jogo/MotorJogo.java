@@ -40,6 +40,13 @@ public final class MotorJogo {
         aventuras = new Aventuras(this, sorte);
     }
 
+    public List<HistoriaCampanha.Fala> introducao() { return HistoriaCampanha.introducao(heroi); }
+
+    public Optional<HistoriaCampanha.Encerramento> encerramento() {
+        if (fase != Fase.VITORIA && fase != Fase.DERROTA) return Optional.empty();
+        return Optional.of(HistoriaCampanha.encerrar(heroi, diario, dia, hardcore, fase == Fase.VITORIA));
+    }
+
     public List<EventoJogo> executar(AcaoJogo acao) {
         List<EventoJogo> eventos = new ArrayList<>();
         Eventos.capturar(eventos::add, () -> processar(acao));

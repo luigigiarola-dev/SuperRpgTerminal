@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'br.com.superrpg'
-version = '2.0.0-alpha.6'
+version = '2.0.0-alpha.7-SNAPSHOT'
 
 repositories { mavenCentral() }
 

@@ -62,7 +62,8 @@ paridade de todos os sistemas nem acabamento artístico final.
 
 ## Próximas entregas, em ordem
 
-1. Revisar a integração narrativa de toda a campanha, incluindo introdução e encerramento.
+1. Revisar a integração narrativa de toda a campanha. Prólogo e encerramentos por honra
+   já implementados na próxima prévia; falta a revisão de continuidade durante uma partida completa.
 2. Conferir manualmente diálogos, torre, atalhos e inventário em diferentes tamanhos de janela.
 3. Validar uma campanha completa por classe e comparar recompensas e progressão com a referência.
    A sequência de missões, os desbloqueios e os checkpoints já têm testes controlados;

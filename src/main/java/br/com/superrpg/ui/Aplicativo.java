@@ -104,10 +104,42 @@ public final class Aplicativo extends Application {
         CheckBox hardcore=new CheckBox("Hardcore — uma única vida");hardcore.setSelected(modoHardcore);hardcore.setOnAction(e->modoHardcore=hardcore.isSelected());
         conteudo.getChildren().addAll(nome,classes,centro,linha(hardcore,espaco(),botao("Voltar","ghost",this::titulo),botao("ENTRAR EM AURORA   →","primary",()->{
             jogo=getParameters().getRaw().contains("--smoke")?new MotorJogo(nomeHeroi,classeEscolhida,modoHardcore,41L):new MotorJogo(nomeHeroi,classeEscolhida,modoHardcore);historico.clear();
-            historico.add("Mira: Bem-vindo a Aurora. A vila precisa de você. Consulte as missões antes de partir.");pagina="Jornada";renderizar();
+            ultimoResultado="";pagina="Jornada";
+            for(var fala:jogo.introducao())historico.add(fala.personagem()+": "+fala.texto());
+            introducao(0);
         })));
         trocar(conteudo);
     }
+    private void introducao(int indice) {
+        var falas=jogo.introducao();var fala=falas.get(indice);
+        VBox painel=coluna(texto("PRÓLOGO  /  "+(indice+1)+" DE "+falas.size(),"eyebrow"),
+            texto("Os portões de Aurora","heading"),texto(fala.personagem(),"gold"),texto(fala.texto(),"intro"));
+        painel.getChildren().add(botao(indice==falas.size()-1?"COMEÇAR JORNADA   →":"PRÓXIMO   →","primary",
+            ()->{if(indice+1<falas.size())introducao(indice+1);else renderizar();}));
+        if(indice<falas.size()-1)painel.getChildren().add(botao("Pular introdução","ghost",this::renderizar));
+        mostrarHistoria(painel,"VILA",jogo.estado().classe());
+    }
+
+    private void mostrarHistoria(VBox painel,String local,String classe) {
+        painel.getStyleClass().add("story-panel");painel.setPadding(new Insets(32));painel.setMaxWidth(650);
+        ScrollPane rolagem=new ScrollPane(painel);rolagem.setFitToWidth(true);rolagem.setMaxWidth(680);rolagem.setMaxHeight(570);
+        rolagem.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        StackPane tela=new StackPane(new Cenario(local,classe,null,false),rolagem);
+        tela.setPadding(new Insets(30));trocar(tela);
+    }
+
+    private void encerramento(HistoriaCampanha.Encerramento fim) {
+        VBox painel=coluna(texto(fim.venceu()?"EPÍLOGO  /  O DRAGÃO CAIU":"FIM DA JORNADA  /  HARDCORE","eyebrow"),
+            texto(fim.titulo(),"heading"),texto(fim.texto(),"intro"),new Separator(),
+            texto(fim.nome()+" · "+fim.classe()+" · Nível "+fim.nivel(),"card-title"),
+            texto("Dias: "+fim.dias()+"  ·  Abates: "+fim.abates()+"  ·  Missões: "+fim.missoes()+"/"+fim.totalMissoes(),"muted"),
+            texto("Honra: "+fim.honra()+"  ·  Modo "+(fim.hardcore()?"Hardcore":"Normal"),"muted"),
+            texto(fim.pontuacao()+" PONTOS","gold"),
+            texto("O ranking ainda não está disponível. Seu último salvamento foi preservado; continuar pelo menu retoma aquele ponto, não este encerramento.","tiny"),
+            botao("VOLTAR AO MENU","primary",()->{jogo=null;titulo();}));
+        mostrarHistoria(painel,fim.venceu()?"VILA":"TITULO",fim.classe());
+    }
+
     private String descricaoClasse() {
         return switch(classeEscolhida) {
             case "Paladino" -> "A luz é seu juramento. Aço, proteção e cura para resistir na linha de frente.";
@@ -120,6 +152,7 @@ public final class Aplicativo extends Application {
 
     private void renderizar() {
         EstadoJogo s=jogo.estado();
+        if(s.talentos()==0 && jogo.encerramento().isPresent()) { encerramento(jogo.encerramento().orElseThrow());return; }
         if(s.fase()!=EstadoJogo.Fase.EXPLORACAO && !pagina.equals("Mochila")) pagina="Jornada";
         if(s.talentos()>0) pagina="Jornada";
         if(s.fase()==EstadoJogo.Fase.EVENTO) pagina="Jornada";
@@ -344,6 +377,7 @@ public final class Aplicativo extends Application {
     }
     private void mensagem(String titulo,String mensagem) { Dialog<Void>d=dialogo(titulo);d.setContentText(mensagem);d.showAndWait(); }
     private void confirmarSaida(Runnable sair) {
+        if(jogo!=null && jogo.encerramento().isPresent()) { sair.run();return; }
         Alert a=new Alert(Alert.AlertType.CONFIRMATION,"O progresso desde o último salvamento será perdido. Use Salvar jornada antes de sair se quiser continuar depois.",ButtonType.CANCEL,ButtonType.OK);
         a.initOwner(janela);a.setHeaderText("Encerrar esta jornada?");a.getDialogPane().getStylesheets().add(getClass().getResource("/tema.css").toExternalForm());
         if(a.showAndWait().orElse(ButtonType.CANCEL)==ButtonType.OK)sair.run();
@@ -394,6 +428,9 @@ public final class Aplicativo extends Application {
         List<Runnable> passos=List.of(
             ()->{snapshot("01-titulo");clicar("NOVA JORNADA   →");},
             ()->{snapshot("02-criacao");((TextField)raiz.lookup(".text-field")).setText("Arthur");clicar("ENTRAR EM AURORA   →");},
+            ()->{snapshot("25-prologo");clicar("PRÓXIMO   →");},
+            ()->{clicar("PRÓXIMO   →");},
+            ()->{snapshot("26-boas-vindas");clicar("COMEÇAR JORNADA   →");},
             ()->{snapshot("03-vila");clicar("Serviços");},
             ()->{snapshot("14-compra");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(1);},
             ()->{snapshot("08-venda");((TabPane)raiz.lookup(".tab-pane")).getSelectionModel().select(2);},
@@ -417,7 +454,16 @@ public final class Aplicativo extends Application {
             ()->{snapshot("07-compacto");jogo=new MotorJogo("Arthur","Paladino",false,41L);historico.clear();pagina="Missões";renderizar();},
             ()->{snapshot("22-moradores");agir(new AcaoJogo(CONVERSAR,0));},
             ()->{snapshot("23-dialogo");clicar("Aceitar: Praga na Floresta");},
-            ()->{if(!jogo.estado().narrativa().texto().contains("Conto com você"))throw new IllegalStateException("Missão não foi aceita na conversa.");clicar("Encerrar conversa");snapshot("24-conversa-concluida");janela.close();Platform.exit();}
+            ()->{if(!jogo.estado().narrativa().texto().contains("Conto com você"))throw new IllegalStateException("Missão não foi aceita na conversa.");clicar("Encerrar conversa");snapshot("24-conversa-concluida");
+                // Dados de apresentação: regras e transição real de vitória são testadas em JUnit.
+                encerramento(new HistoriaCampanha.Encerramento(true,"Aurora verá outro amanhecer",
+                    "O povo canta seu nome: Arthur o Lendário Justo, salvador do reino!","Arthur","Paladino",10,30,80,10,10,4,false,6200));},
+            ()->{snapshot("27-epilogo-compacto");clicar("VOLTAR AO MENU");clicar("NOVA JORNADA   →");clicar("ENTRAR EM AURORA   →");},
+            ()->{snapshot("28-prologo-compacto");clicar("Pular introdução");
+                if(raiz.lookupAll(".button").stream().noneMatch(n->n instanceof Button b&&b.getText().equals("EXPLORAR O MAPA   →")))throw new IllegalStateException("Pular prólogo não abriu a vila.");
+                encerramento(new HistoriaCampanha.Encerramento(false,"Uma lenda chega ao fim",
+                    "Sua lenda termina aqui. Aurora guardará a memória de sua jornada.","Arthur","Paladino",3,8,12,1,10,0,true,650));},
+            ()->{snapshot("29-derrota-compacta");clicar("VOLTAR AO MENU");snapshot("30-retorno-menu");janela.close();Platform.exit();}
         );
         passoSmoke(passos,0);
     }

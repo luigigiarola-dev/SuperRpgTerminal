@@ -7,6 +7,15 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 - **PATCH** (`1.0.1`): correções sem novos recursos relevantes.
 - Sufixos como `alpha.1` indicam versões de desenvolvimento que ainda não estão completas.
 
+## Em desenvolvimento — próxima prévia
+
+- Prólogo com falas originais, avanço por clique e opção de pular, sem repetir ao carregar save.
+- Epílogo conforme a honra, resumo da campanha e pontuação com a fórmula do terminal.
+- Tela de derrota Hardcore; derrota Normal mantém o retorno à vila.
+- Save anterior preservado e limitação do ranking explicitada no encerramento.
+- Testes dos limites de honra, pontuação e integração; roteiro gráfico cobre prólogo,
+  encerramentos com dados de apresentação e retorno ao menu em janela compacta.
+
 ## [2.0.0-alpha.6] — 2026-11-18
 
 - Empacotamento com `jpackage`: aplicativo nativo e runtime incluído por plataforma.
