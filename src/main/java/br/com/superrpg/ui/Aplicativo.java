@@ -33,8 +33,14 @@ public final class Aplicativo extends Application {
     private int abaMissoes;
     private boolean modoHardcore;
     private final Salvamento salvamento = Salvamento.padrao();
+    private Ranking ranking;
+    private String jornadaRegistrada;
 
     @Override public void start(Stage stage) {
+        if(getParameters().getRaw().contains("--smoke")) {
+            try { ranking=new Ranking(Files.createTempDirectory("superrpg-ranking-smoke-").resolve("ranking.json")); }
+            catch(java.io.IOException e) { throw new IllegalStateException("Não foi possível isolar o ranking do teste",e); }
+        } else ranking=Ranking.padrao();
         janela = stage; raiz = new StackPane();
         Scene scene = new Scene(raiz, 1280, 820);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/tema.css")).toExternalForm());
@@ -75,6 +81,7 @@ public final class Aplicativo extends Application {
         painel.setMaxWidth(510);painel.setAlignment(Pos.CENTER_LEFT);painel.setPadding(new Insets(44,60,44,60));
         Button continuar=botao("Continuar jornada", "secondary",()->carregar(false));continuar.setDisable(!salvamento.existe());
         painel.getChildren().addAll(espaco(),botao("NOVA JORNADA   →", "primary",this::criacao),continuar,
+                botao("Salão dos heróis", "secondary",()->ranking(false)),
                 botao("Importar save do terminal", "ghost",()->carregar(true)),
                 botao("Sair", "ghost",janela::close));
         StackPane.setAlignment(painel,Pos.CENTER_LEFT);
@@ -129,15 +136,50 @@ public final class Aplicativo extends Application {
     }
 
     private void encerramento(HistoriaCampanha.Encerramento fim) {
+        String registro="Prévia visual: nenhum resultado registrado.";
+        boolean falhou=false;
+        if(jogo!=null && jogo.encerramento().isPresent()) {
+            try {
+                if(!jogo.idJornada().equals(jornadaRegistrada)) { ranking.registrar(jogo);jornadaRegistrada=jogo.idJornada(); }
+                registro="Primeiro encerramento desta jornada registrado no Salão dos heróis.";
+            } catch(java.io.IOException e) { registro="Não foi possível registrar o ranking. Seu resultado continua nesta tela. "+e.getMessage();falhou=true; }
+        }
         VBox painel=coluna(texto(fim.venceu()?"EPÍLOGO  /  O DRAGÃO CAIU":"FIM DA JORNADA  /  HARDCORE","eyebrow"),
             texto(fim.titulo(),"heading"),texto(fim.texto(),"intro"),new Separator(),
             texto(fim.nome()+" · "+fim.classe()+" · Nível "+fim.nivel(),"card-title"),
             texto("Dias: "+fim.dias()+"  ·  Abates: "+fim.abates()+"  ·  Missões: "+fim.missoes()+"/"+fim.totalMissoes(),"muted"),
             texto("Honra: "+fim.honra()+"  ·  Modo "+(fim.hardcore()?"Hardcore":"Normal"),"muted"),
             texto(fim.pontuacao()+" PONTOS","gold"),
-            texto("O ranking ainda não está disponível. Seu último salvamento foi preservado; continuar pelo menu retoma aquele ponto, não este encerramento.","tiny"),
+            texto(registro,"muted"),
+            texto("Seu último salvamento foi preservado. Repetir o final dessa jornada não adiciona outro resultado ao ranking.","tiny"),
             botao("VOLTAR AO MENU","primary",()->{jogo=null;titulo();}));
+        if(falhou)painel.getChildren().add(botao("Tentar registrar novamente","secondary",this::renderizar));
         mostrarHistoria(painel,fim.venceu()?"VILA":"TITULO",fim.classe());
+    }
+
+    private void ranking(boolean hardcore) {
+        ranking(hardcore,null);
+    }
+
+    private void ranking(boolean hardcore,List<Ranking.Entrada> previa) {
+        VBox painel=coluna(texto("SALÃO DOS HERÓIS","eyebrow"),texto("Lendas de Aurora","heading"),
+            texto("Cinco maiores pontuações por modo. Uma entrada por jornada; o primeiro encerramento é preservado.","muted"),
+            linha(botao("Normal",hardcore?"secondary":"selected",()->ranking(false)),
+                botao("Hardcore",hardcore?"selected":"secondary",()->ranking(true))));
+        try {
+            var entradas=(previa==null?ranking.listar():previa).stream().filter(e->e.resultado().hardcore()==hardcore).limit(5).toList();
+            if(entradas.isEmpty())painel.getChildren().add(texto("Nenhuma jornada concluída neste modo ainda.","intro"));
+            for(int i=0;i<entradas.size();i++) {
+                var r=entradas.get(i).resultado();
+                painel.getChildren().add(coluna(texto((i+1)+". "+r.nome()+" · "+r.pontuacao()+" pontos","card-title"),
+                    texto(r.classe()+" · Nível "+r.nivel()+" · Dia "+r.dias()+" · "+(r.venceu()?"Vitória":"Derrota"),"muted")));
+            }
+        } catch(java.io.IOException e) {
+            painel.getChildren().add(texto("Não foi possível ler o ranking. "+e.getMessage(),"intro"));
+            painel.getChildren().add(botao("Tentar novamente","secondary",()->ranking(hardcore)));
+        }
+        painel.getChildren().add(botao("VOLTAR AO MENU","primary",this::titulo));
+        mostrarHistoria(painel,"TITULO",null);
     }
 
     private String descricaoClasse() {
@@ -463,7 +505,14 @@ public final class Aplicativo extends Application {
                 if(raiz.lookupAll(".button").stream().noneMatch(n->n instanceof Button b&&b.getText().equals("EXPLORAR O MAPA   →")))throw new IllegalStateException("Pular prólogo não abriu a vila.");
                 encerramento(new HistoriaCampanha.Encerramento(false,"Uma lenda chega ao fim",
                     "Sua lenda termina aqui. Aurora guardará a memória de sua jornada.","Arthur","Paladino",3,8,12,1,10,0,true,650));},
-            ()->{snapshot("29-derrota-compacta");clicar("VOLTAR AO MENU");snapshot("30-retorno-menu");janela.close();Platform.exit();}
+            ()->{snapshot("29-derrota-compacta");clicar("VOLTAR AO MENU");snapshot("30-retorno-menu");clicar("Salão dos heróis");},
+            ()->{snapshot("31-ranking-vazio");
+                List<Ranking.Entrada> previa=new ArrayList<>();
+                for(int i=0;i<5;i++)previa.add(new Ranking.Entrada(UUID.randomUUID().toString(),
+                    new HistoriaCampanha.Encerramento(true,"Vitória","Prévia","Alexandre das Terras de Aurora","Necromante",15,100,1000,10,10,5,false,10000-i*100)));
+                ranking(false,previa);},
+            ()->{snapshot("34-ranking-preenchido");clicar("Hardcore");},
+            ()->{snapshot("32-ranking-hardcore");clicar("VOLTAR AO MENU");snapshot("33-ranking-concluido");janela.close();Platform.exit();}
         );
         passoSmoke(passos,0);
     }

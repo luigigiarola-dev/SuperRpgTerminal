@@ -72,7 +72,8 @@ paridade de todos os sistemas nem acabamento artístico final.
    de mensagens por eventos estruturados adicionais, injetar RNG e dividir os serviços por domínio.
 5. Refinar personagens, cenários e animações: movimento de ataque, projéteis, crítico, impacto,
    barras animadas, morte, level up e sinalização de turnos. Adicionar áudio com licenças registradas.
-6. Ranking, opções persistentes, acessibilidade e conferência manual Windows/Linux.
+6. Opções persistentes, acessibilidade e conferência manual Windows/Linux.
+   O ranking gráfico local já está implementado na próxima prévia.
 7. Sobre os aplicativos portáteis já gerados com `jpackage`, criar instaladores, definir
    ícones finais e tratar assinatura/notarização. Conferir abertura em máquinas de jogadores.
 
@@ -108,6 +109,22 @@ e é preservado no JSON formato 4. O formato 3 é aceito sem uma tentativa consu
 não continha esse campo. Nenhuma alegação de balanceamento humano foi feita nesta etapa.
 
 ## Verificação
+
+### Ranking da próxima prévia
+
+O menu oferece o Salão dos heróis, com os cinco melhores resultados separados por modo.
+Vitória e derrota Hardcore registram o primeiro encerramento da jornada; derrota Normal não.
+Empates são ordenados por nome e identificador. Todos os registros ficam em `ranking.json`,
+ao lado do save, com cópia `ranking.anterior.json`. Falhas aparecem na interface e podem
+ser tentadas novamente; arquivos inválidos não são substituídos silenciosamente.
+
+O save formato 4 recebe um campo opcional `idJornada`. Carregar um save antigo atribui uma
+identidade determinística ao conteúdo, sem reescrever a origem. Salvar preserva essa identidade.
+Repetir o final do mesmo save não cria outra entrada; nem substitui o resultado anterior.
+Saves antigos de checkpoints diferentes não têm uma identidade comum recuperável e podem
+ser tratados como jornadas diferentes. Salvar novamente em versões antigas do aplicativo
+também descarta o identificador. Não é um sistema antitrapaça nem um placar online.
+O ranking do terminal permanece separado. Nenhum save é apagado ao encerrar a campanha.
 
 Windows x64 é uma plataforma de destino obrigatória. A versão estável `2.0.0` exige
 validar nesse sistema a inicialização, criação de personagem, combate, redimensionamento,

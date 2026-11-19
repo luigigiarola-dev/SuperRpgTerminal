@@ -5,6 +5,8 @@ import static br.com.superrpg.jogo.EstadoJogo.*;
 
 /** Sessão independente. Cada comando termina imediatamente; nenhuma leitura ou espera. */
 public final class MotorJogo {
+    String idJornada = UUID.randomUUID().toString();
+    public String idJornada() { return idJornada; }
     final Heroi heroi;
     final Diario diario = new Diario();
     Local local = Local.VILA;
