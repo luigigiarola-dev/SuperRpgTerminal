@@ -449,12 +449,13 @@ public final class Aplicativo extends Application {
             if(e.tipo()==EventoJogo.Tipo.VITORIA || e.tipo()==EventoJogo.Tipo.DERROTA)ultimoResultado=e.texto();
         }
         if(a.tipo()==VIAJAR || jogo.estado().fase()!=EstadoJogo.Fase.EXPLORACAO)pagina="Jornada";
-        List<EventoJogo> visuais=eventos.stream().filter(e->e.tipo()==EventoJogo.Tipo.DANO||e.tipo()==EventoJogo.Tipo.CURA).toList();
+        List<EventoJogo> visuais=eventos.stream().filter(e->e.tipo()==EventoJogo.Tipo.DANO||e.tipo()==EventoJogo.Tipo.CURA
+            ||e.tipo()==EventoJogo.Tipo.ESQUIVA||e.tipo()==EventoJogo.Tipo.BLOQUEIO).toList();
         if(rapido || antes.fase()!=EstadoJogo.Fase.COMBATE || arena==null || visuais.isEmpty()) {renderizar();return;}
         animando=true;raiz.setDisable(true);
         SequentialTransition fila=new SequentialTransition();
         for(var e:visuais) {
-            Label dano=texto((e.tipo()==EventoJogo.Tipo.CURA?"+":"−")+e.valor(),e.tipo()==EventoJogo.Tipo.CURA?"heal-number":"damage-number");
+            Label dano=rotuloImpacto(e);
             boolean heroi=e.alvo().equals(antes.heroi().nome());dano.setTranslateX((heroi?-.23:.23)*arena.getWidth());dano.setTranslateY(20);dano.setOpacity(0);arena.getChildren().add(dano);
             FadeTransition aparecer=new FadeTransition(Duration.millis(50),dano);aparecer.setToValue(1);
             TranslateTransition subir=new TranslateTransition(Duration.millis(260),dano);subir.setByY(-50);
@@ -462,6 +463,31 @@ public final class Aplicativo extends Application {
             fila.getChildren().addAll(aparecer,subir,sumir);
         }
         fila.setOnFinished(e->{animando=false;raiz.setDisable(false);renderizar();});fila.play();
+    }
+
+    private Label rotuloImpacto(EventoJogo e) {
+        String rotulo=switch(e.tipo()) {
+            case ESQUIVA -> "ESQUIVA";
+            case BLOQUEIO -> "BLOQUEADO";
+            case CURA -> "+"+e.valor();
+            default -> "−"+e.valor();
+        };
+        String estilo=e.tipo()==EventoJogo.Tipo.CURA?"heal-number":
+            e.tipo()==EventoJogo.Tipo.ESQUIVA||e.tipo()==EventoJogo.Tipo.BLOQUEIO?"defense-number":"damage-number";
+        var impacto=e.impacto();
+        if(impacto!=null) {
+            if(e.tipo()==EventoJogo.Tipo.DANO)estilo="impact-number";
+            List<String> detalhes=new ArrayList<>();
+            if(impacto.critico()) { detalhes.add("CRÍTICO");estilo="critical-number"; }
+            if(impacto.afinidade()>1)detalhes.add("FRAQUEZA · "+impacto.elemento());
+            else if(impacto.afinidade()<1)detalhes.add("RESISTÊNCIA · "+impacto.elemento());
+            if(impacto.guarda())detalhes.add("EM GUARDA");
+            if(impacto.absorvido()>0)detalhes.add("ESCUDO · "+impacto.absorvido()+" absorvido");
+            if(!detalhes.isEmpty())rotulo+="\n"+String.join("\n",detalhes);
+        }
+        Label label=texto(rotulo,estilo);label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        label.setAlignment(Pos.CENTER);label.setMaxWidth(360);label.setMinHeight(Region.USE_PREF_SIZE);
+        label.setMouseTransparent(true);return label;
     }
 
     /** Teste visual reproduzível sem alterar saves nem configurações do usuário. */
@@ -491,8 +517,11 @@ public final class Aplicativo extends Application {
             ()->{snapshot("04-mapa");agir(new AcaoJogo(VIAJAR,1));clicar("EXPLORAR OS ARREDORES");},
             ()->{snapshot("20-viajante");clicar("Seguir caminho");},
             ()->{snapshot("21-escolha");clicar("Continuar jornada");clicar("EXPLORAR OS ARREDORES");},
-            ()->{snapshot("05-combate");clicar("1  Atacar");},
-            ()->{snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},
+            ()->{snapshot("05-combate");rapido=false;clicar("1  Atacar");
+                if(!animando||!raiz.isDisabled())throw new IllegalStateException("Fila visual não bloqueou a entrada.");
+                var antes=jogo.estado();agir(AcaoJogo.de(ATACAR));
+                if(!antes.equals(jogo.estado()))throw new IllegalStateException("Comando extra durante animação.");},
+            ()->{if(raiz.isDisabled())throw new IllegalStateException("Entrada não foi liberada.");rapido=true;snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},
             ()->{snapshot("07-compacto");jogo=new MotorJogo("Arthur","Paladino",false,41L);historico.clear();pagina="Missões";renderizar();},
             ()->{snapshot("22-moradores");agir(new AcaoJogo(CONVERSAR,0));},
             ()->{snapshot("23-dialogo");clicar("Aceitar: Praga na Floresta");},
@@ -512,12 +541,21 @@ public final class Aplicativo extends Application {
                     new HistoriaCampanha.Encerramento(true,"Vitória","Prévia","Alexandre das Terras de Aurora","Necromante",15,100,1000,10,10,5,false,10000-i*100)));
                 ranking(false,previa);},
             ()->{snapshot("34-ranking-preenchido");clicar("Hardcore");},
-            ()->{snapshot("32-ranking-hardcore");clicar("VOLTAR AO MENU");snapshot("33-ranking-concluido");janela.close();Platform.exit();}
+            ()->{snapshot("32-ranking-hardcore");
+                TilePane exemplos=new TilePane(20,30);exemplos.setPrefColumns(2);exemplos.setPrefTileWidth(430);
+                exemplos.getChildren().addAll(
+                    rotuloImpacto(new EventoJogo(EventoJogo.Tipo.DANO,"Alvo",42,"",new EventoJogo.Impacto(true,"Fogo",1.5,false,0))),
+                    rotuloImpacto(new EventoJogo(EventoJogo.Tipo.DANO,"Alvo",8,"",new EventoJogo.Impacto(false,"Sombra",0.5,true,0))),
+                    rotuloImpacto(new EventoJogo(EventoJogo.Tipo.BLOQUEIO,"Alvo",0,"",new EventoJogo.Impacto(false,"Físico",1,false,20))),
+                    rotuloImpacto(new EventoJogo(EventoJogo.Tipo.ESQUIVA,"Alvo",0,"")));
+                VBox previa=coluna(texto("IMPACTOS · PRÉVIA VISUAL","heading"),exemplos);previa.setPadding(new Insets(36));trocar(previa);},
+            ()->{snapshot("35-impactos");titulo();snapshot("33-ranking-concluido");janela.close();Platform.exit();}
         );
         passoSmoke(passos,0);
     }
     private void passoSmoke(List<Runnable> passos,int i) {
         PauseTransition p=new PauseTransition(Duration.millis(350));p.setOnFinished(e->{
+            if(animando) { passoSmoke(passos,i);return; }
             try { passos.get(i).run();if(i+1<passos.size())passoSmoke(passos,i+1); }
             catch(Throwable falha){falha.printStackTrace();System.exit(1);}
         });p.play();

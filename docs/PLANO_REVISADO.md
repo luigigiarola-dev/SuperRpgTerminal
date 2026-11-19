@@ -35,8 +35,9 @@ O ranking passou em 111 testes e no roteiro gráfico das seis combinações de s
 ## Próxima sequência de trabalho
 
 1. Ranking local validado e integrado, preservando saves existentes — etapa concluída.
-2. Retomar o combate visual da Fase 3: primeiro eventos estruturados para efeitos e animações
-   verificáveis; depois movimento, barras suaves e leitura clara de crítico/resistência.
+2. Retomar o combate visual da Fase 3: impactos estruturados e rótulos de crítico, afinidade,
+   guarda, escudo e esquiva estão implementados na branch de impactos, aguardando integração.
+   Movimento dos personagens, barras suaves e ícones próprios continuam pendentes.
 3. Conferir ficha de atributos e interação das telas compactas; avançar na apresentação do mundo.
 4. Consolidar opções, áudio e arte com licenças registradas.
 5. Publicar a próxima prévia somente com os pacotes correspondentes validados.

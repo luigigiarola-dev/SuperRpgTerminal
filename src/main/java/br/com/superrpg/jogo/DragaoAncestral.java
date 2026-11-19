@@ -23,13 +23,13 @@ class DragaoAncestral extends Monstro {
     @Override void especial(Heroi h) {
         Eventos.texto("\n🔥 Ignis cospe uma rajada de brasas!");
 
-        h.receberDano(calcularAtaque(1.0) + 10, Elemento.FOGO, true);
+        h.receberDano(calcularAtaque(1.0).somar(10), Elemento.FOGO, true);
         h.adicionarEfeito(new Efeito(TipoEfeito.QUEIMADURA, 3, 10));
     }
     @Override void golpePesado(Heroi h) {
         Eventos.texto(Cor.c(Cor.VERMELHO + Cor.NEGRITO, "\n🔥🔥 SOPRO DE FOGO ANCESTRAL!"));
 
-        h.receberDano(calcularAtaque(1.0) + 55, Elemento.FOGO, false);
+        h.receberDano(calcularAtaque(1.0).somar(55), Elemento.FOGO, false);
         h.adicionarEfeito(new Efeito(TipoEfeito.QUEIMADURA, 3, 12));
     }
 }

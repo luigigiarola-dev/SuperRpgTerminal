@@ -109,8 +109,14 @@ abstract class Entidade {
 
     /** Aplica dano considerando esquiva, afinidade elemental, defesa, guarda e escudo. */
     int receberDano(int bruto, Elemento elem, boolean podeEsquivar) {
+        return receberDano(new Ataque(bruto,false),elem,podeEsquivar);
+    }
+
+    int receberDano(Ataque ataque, Elemento elem, boolean podeEsquivar) {
+        int bruto=ataque.valor();
         if (podeEsquivar && RNG.nextInt(100) < Math.min(30, getAgilidade() / 2)) {
             Eventos.texto(Cor.c(Cor.CIANO, "💨 " + nome + " esquivou do ataque!"));
+            Eventos.emitir(new EventoJogo(EventoJogo.Tipo.ESQUIVA,nome,0,""));
             return 0;
         }
         double m = afinidade.getOrDefault(elem, 1.0);
@@ -122,26 +128,39 @@ abstract class Entidade {
             Eventos.texto("🛡️  " + nome + " está em guarda e reduz o impacto!");
         }
         dano = Math.max(1, dano);
+        int absorvido=0;
         Efeito esc = obterEfeito(TipoEfeito.ESCUDO);
         if (esc != null && esc.valor > 0) {
-            int absorvido = Math.min(dano, esc.valor);
+            absorvido = Math.min(dano, esc.valor);
             esc.valor -= absorvido;
             dano -= absorvido;
             Eventos.texto(Cor.c(Cor.CIANO, "🛡️  O escudo absorveu " + absorvido + " de dano!"));
-            if (dano == 0) return 0;
+            if (dano == 0) {
+                Eventos.emitir(new EventoJogo(EventoJogo.Tipo.BLOQUEIO,nome,0,"",
+                    new EventoJogo.Impacto(ataque.critico(),elem.nome,m,defendendo,absorvido)));
+                return 0;
+            }
         }
-        perderHp(dano);
+        int anterior=hp;
+        hp=Math.max(0,hp-dano);
+        if(anterior>hp)Eventos.emitir(new EventoJogo(EventoJogo.Tipo.DANO,nome,anterior-hp,"",
+            new EventoJogo.Impacto(ataque.critico(),elem.nome,m,defendendo,absorvido)));
         Eventos.texto(Cor.c(Cor.VERMELHO, "💥 " + nome + " sofreu " + dano + " de dano!"));
         return dano;
     }
 
-    int calcularAtaque(double mult) {
+    record Ataque(int valor, boolean critico) {
+        Ataque somar(int bonus) { return new Ataque(valor+bonus,critico); }
+    }
+
+    Ataque calcularAtaque(double mult) {
         int base = (int) ((getAtaque() + RNG.nextInt(7) - 3) * mult);
-        if (RNG.nextInt(100) < 8 + getAgilidade() / 2) {
+        boolean critico=RNG.nextInt(100) < 8 + getAgilidade() / 2;
+        if (critico) {
             Eventos.texto(Cor.c(Cor.AMARELO + Cor.NEGRITO, "⭐ ACERTO CRÍTICO!"));
             base = (int) (base * 1.5);
         }
-        return Math.max(1, base);
+        return new Ataque(Math.max(1, base),critico);
     }
 }
 

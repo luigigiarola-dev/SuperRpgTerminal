@@ -20,7 +20,7 @@ class Slime extends Monstro {
     }
     @Override void especial(Heroi h) {
         Eventos.texto("\n🧪 A Gosma cospe ácido corrosivo!");
-        h.receberDano(calcularAtaque(1.0) + 8, Elemento.SOMBRA, true);
+        h.receberDano(calcularAtaque(1.0).somar(8), Elemento.SOMBRA, true);
         h.modificarMana(-10);
     }
 }

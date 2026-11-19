@@ -9,6 +9,12 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 
 ## Em desenvolvimento — próxima prévia
 
+- Impactos estruturados de combate: crítico, elemento, afinidade, guarda e absorção por escudo.
+- Indicação visual explícita de crítico, fraqueza, resistência, esquiva e bloqueio total,
+  sem interpretar mensagens do histórico nem alterar a fórmula de dano.
+- Testes da sequência de sorteios e dos impactos; roteiro gráfico testa bloqueio e
+  liberação de comandos durante uma animação real, além de capturar os novos rótulos.
+
 - Salão dos heróis com cinco melhores resultados por modo Normal/Hardcore.
 - Ranking local em JSON com escrita atômica quando disponível, cópia anterior e trava
   contra gravação simultânea. Arquivos inválidos são preservados, com erro visível e nova tentativa.
