@@ -36,8 +36,8 @@ O ranking passou em 111 testes e no roteiro gráfico das seis combinações de s
 
 1. Ranking local validado e integrado, preservando saves existentes — etapa concluída.
 2. Retomar o combate visual da Fase 3: impactos estruturados e rótulos de crítico, afinidade,
-   guarda, escudo e esquiva estão implementados na branch de impactos, aguardando integração.
-   Movimento dos personagens, barras suaves e ícones próprios continuam pendentes.
+   guarda, escudo e esquiva integrados pela revisão #10. Recuo e esquiva dos personagens
+   estão em validação separada. Avanço de ataque, barras suaves e ícones próprios seguem pendentes.
 3. Conferir ficha de atributos e interação das telas compactas; avançar na apresentação do mundo.
 4. Consolidar opções, áudio e arte com licenças registradas.
 5. Publicar a próxima prévia somente com os pacotes correspondentes validados.
@@ -45,3 +45,11 @@ O ranking passou em 111 testes e no roteiro gráfico das seis combinações de s
 Campanhas completas nas cinco classes, comparação com a referência e revisão de equilíbrio
 continuam sendo critérios da versão estável, não consequências automáticas de testes verdes.
 Os testes controlados de progressão não substituem jogar partidas completas.
+
+## Diversão e ritmo como critérios de qualidade
+
+Efeitos devem ajudar a entender e sentir as ações sem prolongar desnecessariamente os turnos.
+Reações de impacto são curtas, paralelas aos números flutuantes e dispensáveis no modo rápido.
+Nas campanhas jogadas, avaliar tempo entre decisões, repetição de encontros, utilidade real
+das habilidades, dificuldade dos chefes e sensação de progresso. Testes automáticos não
+comprovam diversão; ajustar regras e balanceamento exige evidência de jogo e registro das mudanças.
