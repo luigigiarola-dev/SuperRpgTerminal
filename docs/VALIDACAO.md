@@ -19,10 +19,14 @@ serviços, realiza uma cura, confere o débito de ouro, responde uma charada, jo
 ouve um rumor, viaja, resolve o encontro com um viajante e entra em combate.
 Ele ataca e captura a janela reduzida, inclusive a taverna. Em uma nova sessão, abre
 moradores, conversa com Mira, aceita uma missão e encerra a conversa. A captura final é
-`30-retorno-menu.png`. Também percorre o prólogo completo e sua opção de pular,
+`33-ranking-concluido.png`. Também percorre o prólogo completo e sua opção de pular,
 e captura vitória e derrota em janela compacta com dados fixos de apresentação.
 Esses dados não simulam vencer a campanha: a transição real e o resumo são cobertos
 nos testes de regras. O Linux utiliza uma tela virtual Xvfb.
+O ranking é isolado em diretório temporário durante o roteiro: nenhum ranking pessoal
+é lido ou escrito. Há capturas da lista vazia, das duas modalidades e de cinco resultados
+com nomes longos usando dados de apresentação. Persistência, duplicidade, trava de escrita,
+arquivos corrompidos e identidade de saves antigos são verificados por `RankingTest`.
 
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.

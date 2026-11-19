@@ -9,6 +9,13 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 
 ## Em desenvolvimento — próxima prévia
 
+- Salão dos heróis com cinco melhores resultados por modo Normal/Hardcore.
+- Ranking local em JSON com escrita atômica quando disponível, cópia anterior e trava
+  contra gravação simultânea. Arquivos inválidos são preservados, com erro visível e nova tentativa.
+- Identidade persistente opcional no save formato 4: o primeiro encerramento de uma jornada
+  é registrado uma única vez, inclusive após carregar o mesmo save.
+- Ranking do terminal permanece separado; não há importação automática nem placar online.
+
 - Prólogo com falas originais, avanço por clique e opção de pular, sem repetir ao carregar save.
 - Epílogo conforme a honra, resumo da campanha e pontuação com a fórmula do terminal.
 - Tela de derrota Hardcore; derrota Normal mantém o retorno à vila.

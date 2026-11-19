@@ -10,7 +10,7 @@ Consulte o [histórico de versões](CHANGELOG.md) e as
 [versões publicadas no GitHub](https://github.com/luigigiarola-dev/SuperRpgTerminal/releases).
 
 Na próxima prévia (`2.0.0-alpha.7-SNAPSHOT`, código em desenvolvimento): prólogo,
-epílogos por honra, resumo e pontuação da campanha. Esses recursos ainda não estão
+epílogos por honra, resumo, pontuação e ranking local por modo. Esses recursos ainda não estão
 nos aplicativos da release alpha 6; os downloads publicados permanecem inalterados.
 
 ## Interface gráfica — primeira etapa da migração
@@ -36,7 +36,7 @@ Já disponíveis na interface:
 - Salvamento JSON, cópia do save anterior e importação de `rpg_save.txt` no formato interno 2
   do save legado. Esse número pertence ao formato do arquivo e não à versão pública do jogo.
 
-Ainda pendentes: revisão narrativa da campanha completa, ranking gráfico,
+Ainda pendentes: revisão narrativa da campanha completa, opções persistentes,
 áudio, animações completas e instaladores com Java embutido.
 **Explorar os arredores** segue a distribuição original: 40% combate, 10% baú, 10% armadilha,
 10% fogueira e 30% encontro narrativo (viajante, santuário, cofre, mercador ou fonte).
