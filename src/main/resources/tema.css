@@ -52,6 +52,8 @@
 .boss-warning { -fx-background-color: #53352b; -fx-border-color: #c08a55; -fx-padding: 10 22; -fx-text-fill: #f2d1a3; -fx-font-weight: bold; }
 .damage-number { -fx-font-family: "Georgia"; -fx-font-weight: bold; -fx-font-size: 36px; -fx-text-fill: #f3ac88; -fx-effect: dropshadow(gaussian, #180e15, 3, 1, 1, 2); }
 .heal-number { -fx-font-size: 32px; -fx-text-fill: #a9d5a2; -fx-font-weight: bold; }
+.critical-number { -fx-font-size: 30px; -fx-text-fill: #ffe29b; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #180e15, 4, 1, 1, 2); }
+.defense-number { -fx-font-size: 26px; -fx-text-fill: #a9d5ec; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #180e15, 4, 1, 1, 2); }
 .dialog-pane { -fx-background-color: #132127; -fx-padding: 20; }
 .dialog-pane:header .header-panel { -fx-background-color: #132127; }
 .dialog-pane:header .header-panel .label { -fx-text-fill: #dfcca4; -fx-font-family: "Georgia"; -fx-font-size: 22px; }

@@ -22,14 +22,14 @@ class Beholder extends Monstro {
     @Override void especial(Heroi h) {
         Eventos.texto("\n🌑 O Observador fixa o olhar e queima sua mana!");
 
-        h.receberDano(calcularAtaque(1.0) + 10, Elemento.SOMBRA, true);
+        h.receberDano(calcularAtaque(1.0).somar(10), Elemento.SOMBRA, true);
         h.modificarMana(-20);
         h.adicionarEfeito(new Efeito(TipoEfeito.LENTIDAO, 2, 0));
     }
     @Override void golpePesado(Heroi h) {
         Eventos.texto(Cor.c(Cor.VERMELHO + Cor.NEGRITO, "\n🔴 O GRANDE OLHO CENTRAL EMITE UM RAIO ANTIVITAL!"));
 
-        h.receberDano(calcularAtaque(1.0) + 40, Elemento.RAIO, false);
+        h.receberDano(calcularAtaque(1.0).somar(40), Elemento.RAIO, false);
         h.modificarMana(-25);
     }
 }

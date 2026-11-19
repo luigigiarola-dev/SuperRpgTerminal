@@ -27,6 +27,11 @@ O ranking é isolado em diretório temporário durante o roteiro: nenhum ranking
 é lido ou escrito. Há capturas da lista vazia, das duas modalidades e de cinco resultados
 com nomes longos usando dados de apresentação. Persistência, duplicidade, trava de escrita,
 arquivos corrompidos e identidade de saves antigos são verificados por `RankingTest`.
+Um ataque do roteiro agora usa animações: exige entrada bloqueada durante a fila,
+ignora um comando adicional e exige sua liberação ao final. `35-impactos.png` apresenta
+rótulos com dados fixos para conferência visual de crítico/fraqueza, resistência/guarda,
+bloqueio e esquiva. `ImpactosTest` verifica os metadados, a fórmula e a quantidade de
+sorteios, dano letal, escudo e ausência de metadados indevidos em cura e dano direto.
 
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.
