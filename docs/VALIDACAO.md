@@ -32,6 +32,8 @@ ignora um comando adicional e exige sua liberação ao final. `35-impactos.png` 
 rótulos com dados fixos para conferência visual de crítico/fraqueza, resistência/guarda,
 bloqueio e esquiva. `ImpactosTest` verifica os metadados, a fórmula e a quantidade de
 sorteios, dano letal, escudo e ausência de metadados indevidos em cura e dano direto.
+O roteiro verifica também recuo e esquiva de herói/inimigo: exige deslocamento no instante
+de impacto, captura as quatro combinações e exige retorno à posição neutra ao final.
 
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.

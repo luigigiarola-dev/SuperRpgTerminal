@@ -4,6 +4,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.*;
+import javafx.animation.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.util.Duration;
 import java.util.Random;
 
 /** Arte original desenhada em código, sem dependência de imagens externas. */
@@ -11,10 +15,27 @@ final class Cenario extends Region {
     private final Canvas canvas = new Canvas();
     private final String local, classe, monstro;
     private final boolean noite;
+    private final DoubleProperty deslocamentoHeroi=new SimpleDoubleProperty();
+    private final DoubleProperty deslocamentoInimigo=new SimpleDoubleProperty();
     Cenario(String local, String classe, String monstro, boolean noite) {
         this.local = local; this.classe = classe; this.monstro = monstro; this.noite = noite;
         getChildren().add(canvas); setMinHeight(180); setPrefHeight(370);
+        deslocamentoHeroi.addListener((o,a,b)->desenhar());
+        deslocamentoInimigo.addListener((o,a,b)->desenhar());
     }
+
+    /** Reação apenas visual: o cenário fica imóvel e nenhuma regra é recalculada. */
+    Animation reagir(boolean alvoHeroi, boolean esquiva) {
+        DoubleProperty deslocamento=alvoHeroi?deslocamentoHeroi:deslocamentoInimigo;
+        double distancia=(alvoHeroi?-1:1)*(esquiva?32:12);
+        Timeline movimento=new Timeline(
+            new KeyFrame(Duration.ZERO,new KeyValue(deslocamento,0)),
+            new KeyFrame(Duration.millis(90),new KeyValue(deslocamento,distancia,Interpolator.EASE_OUT)),
+            new KeyFrame(Duration.millis(esquiva?300:220),new KeyValue(deslocamento,0,Interpolator.EASE_BOTH)));
+        return movimento;
+    }
+
+    boolean posicaoNeutra() { return deslocamentoHeroi.get()==0 && deslocamentoInimigo.get()==0; }
     @Override protected void layoutChildren() {
         canvas.setWidth(getWidth()); canvas.setHeight(getHeight()); desenhar();
     }
@@ -68,8 +89,8 @@ final class Cenario extends Region {
             g.setFill(Color.web(fogo ? "#e59251" : "#849777", .12+r.nextDouble()*.12));
             g.fillRect(r.nextInt(960),345+r.nextInt(75),r.nextInt(12)+2,2);
         }
-        if (classe != null) heroi(g, monstro == null ? 470 : 250, 339, classe);
-        if (monstro != null) inimigo(g, 700,339,monstro);
+        if (classe != null) heroi(g, (monstro == null ? 470 : 250)+deslocamentoHeroi.get(), 339, classe);
+        if (monstro != null) inimigo(g, 700+deslocamentoInimigo.get(),339,monstro);
         for(int i=0;i<17;i++) {
             int x=r.nextInt(960),y=210+r.nextInt(170);
             g.setFill(Color.web(fogo ? "#efa45c" : "#c8c27e", .08)); g.fillOval(x-5,y-5,14,14);

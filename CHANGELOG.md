@@ -9,6 +9,10 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 
 ## Em desenvolvimento — próxima prévia
 
+- Recuo curto ao receber dano/bloqueio e deslocamento maior na esquiva, para herói e inimigo.
+  As reações acompanham os números flutuantes sem aumentar a duração da fila existente;
+  o modo rápido pula os efeitos. Cenário e regras permanecem inalterados.
+
 - Impactos estruturados de combate: crítico, elemento, afinidade, guarda e absorção por escudo.
 - Indicação visual explícita de crítico, fraqueza, resistência, esquiva e bloqueio total,
   sem interpretar mensagens do histórico nem alterar a fórmula de dano.

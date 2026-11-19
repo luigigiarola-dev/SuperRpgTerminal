@@ -460,9 +460,17 @@ public final class Aplicativo extends Application {
             FadeTransition aparecer=new FadeTransition(Duration.millis(50),dano);aparecer.setToValue(1);
             TranslateTransition subir=new TranslateTransition(Duration.millis(260),dano);subir.setByY(-50);
             FadeTransition sumir=new FadeTransition(Duration.millis(150),dano);sumir.setToValue(0);
-            fila.getChildren().addAll(aparecer,subir,sumir);
+            SequentialTransition numero=new SequentialTransition(aparecer,subir,sumir);
+            if(e.tipo()!=EventoJogo.Tipo.CURA && arena.getChildren().getFirst() instanceof Cenario cena)
+                fila.getChildren().add(new ParallelTransition(numero,cena.reagir(heroi,e.tipo()==EventoJogo.Tipo.ESQUIVA)));
+            else fila.getChildren().add(numero);
         }
-        fila.setOnFinished(e->{animando=false;raiz.setDisable(false);renderizar();});fila.play();
+        fila.setOnFinished(e->{
+            if(getParameters().getRaw().contains("--smoke") && arena.getChildren().getFirst() instanceof Cenario cena && !cena.posicaoNeutra()) {
+                new IllegalStateException("Personagens não retornaram à posição inicial.").printStackTrace();System.exit(1);
+            }
+            animando=false;raiz.setDisable(false);renderizar();
+        });fila.play();
     }
 
     private Label rotuloImpacto(EventoJogo e) {
@@ -549,7 +557,17 @@ public final class Aplicativo extends Application {
                     rotuloImpacto(new EventoJogo(EventoJogo.Tipo.BLOQUEIO,"Alvo",0,"",new EventoJogo.Impacto(false,"Físico",1,false,20))),
                     rotuloImpacto(new EventoJogo(EventoJogo.Tipo.ESQUIVA,"Alvo",0,"")));
                 VBox previa=coluna(texto("IMPACTOS · PRÉVIA VISUAL","heading"),exemplos);previa.setPadding(new Insets(36));trocar(previa);},
-            ()->{snapshot("35-impactos");titulo();snapshot("33-ranking-concluido");janela.close();Platform.exit();}
+            ()->{snapshot("35-impactos");
+                Cenario cena=new Cenario("FLORESTA","Paladino","Slime",false);trocar(cena);raiz.applyCss();raiz.layout();
+                for(boolean heroi:new boolean[]{true,false})for(boolean esquiva:new boolean[]{false,true}) {
+                    Animation movimento=cena.reagir(heroi,esquiva);movimento.play();movimento.pause();movimento.jumpTo(Duration.millis(90));
+                    if(cena.posicaoNeutra())throw new IllegalStateException("Reação não deslocou o personagem.");
+                    snapshot("36-reacao-"+(heroi?"heroi":"inimigo")+(esquiva?"-esquiva":"-dano"));
+                    movimento.jumpTo(movimento.getTotalDuration());
+                    if(!cena.posicaoNeutra())throw new IllegalStateException("Reação não retornou à posição inicial.");
+                    movimento.stop();
+                }
+                titulo();snapshot("33-ranking-concluido");janela.close();Platform.exit();}
         );
         passoSmoke(passos,0);
     }
