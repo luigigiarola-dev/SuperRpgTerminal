@@ -34,6 +34,10 @@ bloqueio e esquiva. `ImpactosTest` verifica os metadados, a fórmula e a quantid
 sorteios, dano letal, escudo e ausência de metadados indevidos em cura e dano direto.
 O roteiro verifica também recuo e esquiva de herói/inimigo: exige deslocamento no instante
 de impacto, captura as quatro combinações e exige retorno à posição neutra ao final.
+O combate do roteiro exige os três botões de habilidade e usa uma habilidade diretamente,
+sem abrir o diálogo. `OrientacaoTest` verifica orientação inicial, progresso/entrega,
+prioridade de objetivos cumpridos, custo/recarga nas cinco classes e consultas sem
+alterar o estado nem consumir sorteios. Avaliação de diversão: ver `PLAYTEST_INICIAL.md`.
 
 Os testes de regras cobrem os dois andares e o chefe da torre, preparação, descida,
 reinício da subida, derrota, restrição de save e recompensa única das conversas.

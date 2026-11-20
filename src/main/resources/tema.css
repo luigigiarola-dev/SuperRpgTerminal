@@ -54,6 +54,8 @@
 .heal-number { -fx-font-size: 32px; -fx-text-fill: #a9d5a2; -fx-font-weight: bold; }
 .critical-number { -fx-font-size: 30px; -fx-text-fill: #ffe29b; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #180e15, 4, 1, 1, 2); }
 .impact-number { -fx-font-size: 24px; -fx-text-fill: #f3ac88; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #180e15, 4, 1, 1, 2); }
+.combat-skill { -fx-background-color: #223b3e; -fx-border-color: #8b805d; -fx-text-fill: #e1d4af; -fx-font-size: 12px; -fx-padding: 9 10; }
+.combat-skill:hover { -fx-background-color: #314d4e; }
 .defense-number { -fx-font-size: 26px; -fx-text-fill: #a9d5ec; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, #180e15, 4, 1, 1, 2); }
 .dialog-pane { -fx-background-color: #132127; -fx-padding: 20; }
 .dialog-pane:header .header-panel { -fx-background-color: #132127; }
