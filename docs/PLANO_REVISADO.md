@@ -1,5 +1,12 @@
 # Plano revisado e estado real da migração
 
+## Ampliação de escopo autorizada
+
+Em 19/11/2026, o autor autorizou mudanças radicais para priorizar diversão, além da migração
+fiel do terminal. A [direção criativa](DIRECAO_CRIATIVA.md) registra fontes, critérios,
+diferenças autorizadas e a nova sequência. As fases abaixo continuam como histórico e
+controle técnico; não impedem redesenhar combate, exploração ou progressão.
+
 Referência de acompanhamento: plano de fases 0–6 aprovado pelo autor.
 Atualizado em 19/11/2026. Funcionalidade implementada não significa acabamento final
 nem disponibilidade nos aplicativos já publicados: a última release é a alpha 6.

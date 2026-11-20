@@ -8,7 +8,12 @@ public record EstadoJogo(Fase fase, Personagem heroi, Personagem inimigo, String
         int honra, int talentos, boolean hardcore, int rodada, List<Opcao> habilidades,
         List<Opcao> inventario, List<Opcao> locais, List<Opcao> missoes, List<Opcao> loja,
         List<String> equipamentos, Vila vila, Narrativa narrativa, boolean charadaHoje, int andarTorre) {
-    public record Narrativa(String titulo, String texto, List<Opcao> escolhas, boolean respostaLivre) {}
+    public record Narrativa(String titulo, String texto, List<Opcao> escolhas, boolean respostaLivre,
+            String moradorId, Integer saida) {
+        public Narrativa(String titulo,String texto,List<Opcao> escolhas,boolean respostaLivre) {
+            this(titulo,texto,escolhas,respostaLivre,null,null);
+        }
+    }
     public record Vila(List<Opcao> vendas, List<Opcao> forja, List<Opcao> receitas,
             List<Opcao> cura, List<Opcao> doacao, List<Opcao> aliados, List<Opcao> dispensa,
             String aliadoAtual, List<Opcao> descanso) {}
