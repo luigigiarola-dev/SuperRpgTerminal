@@ -9,6 +9,12 @@ Este projeto segue o [Versionamento Semântico](https://semver.org/lang/pt-BR/):
 
 ## Em desenvolvimento — próxima prévia
 
+- Saída das conversas em rodapé fixo, fora da rolagem; Escape encerra apenas eventos
+  que oferecem uma saída válida. Detalhes de missão recolhíveis e emblemas provisórios de NPCs.
+- Textos de apoio maiores e com mais contraste; falas destacadas em 18 px.
+- Nova direção autorizada pelo autor: pesquisa e redesenho de jogabilidade além do terminal,
+  preservando a referência original e documentando mudanças de regras e compatibilidade.
+
 - Objetivo sugerido visível na exploração: primeiro contato, progresso, local de busca
   e retorno para entrega. Não aceita nem entrega missões automaticamente.
 - Três habilidades acessíveis diretamente no combate, com custo/elemento e motivos

@@ -53,6 +53,12 @@ public final class Aplicativo extends Application {
         });
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.F11) stage.setFullScreen(!stage.isFullScreen());
+            if(e.getCode()==KeyCode.ESCAPE && jogo!=null && !animando && jogo.estado().fase()==EstadoJogo.Fase.EVENTO) {
+                var n=jogo.estado().narrativa();
+                if(n.saida()!=null && n.escolhas().stream().anyMatch(o->o.id()==n.saida()&&o.disponivel())) {
+                    agir(new AcaoJogo(ESCOLHER_EVENTO,n.saida()));e.consume();return;
+                }
+            }
             if (jogo == null || animando || !pagina.equals("Jornada") || jogo.estado().fase() != EstadoJogo.Fase.COMBATE) return;
             if (e.getCode() == KeyCode.DIGIT1) agir(AcaoJogo.de(ATACAR));
             if (e.getCode() == KeyCode.DIGIT2) habilidades();
@@ -389,8 +395,21 @@ public final class Aplicativo extends Application {
         return secoes(dadosBox,charadaBox,rumorBox);
     }
     private Node narrativa(EstadoJogo.Narrativa n) {
-        VBox conteudo=coluna(texto("ENCONTROS E ESCOLHAS","eyebrow"),texto(n.titulo(),"heading"),texto(n.texto(),"intro"));
+        VBox cabecalho=coluna(texto(n.moradorId()==null?"ENCONTROS E ESCOLHAS":"MORADORES DE AURORA","eyebrow"),texto(n.titulo(),"heading"),texto(n.texto(),"dialogue-text"));
+        if(n.moradorId()!=null) {
+            String papel=switch(n.moradorId()) {
+                case "Mira" -> "GUARDA DA VILA";case "Lira" -> "TEMPLO E CUIDADO";
+                case "Borin" -> "FORJA E OFÍCIO";case "Aldric" -> "SABERES ANTIGOS";default -> "TAVERNA E RUMORES";
+            };
+            Label emblema=texto(n.moradorId().substring(0,1),"npc-emblem");
+            emblema.getStyleClass().add("npc-"+n.moradorId().toLowerCase(Locale.ROOT));
+            cabecalho.getChildren().set(0,linha(emblema,texto(papel,"eyebrow")));
+        }
+        cabecalho.getStyleClass().add("dialogue-header");
+        VBox conteudo=new VBox(12);
+        conteudo.getStyleClass().add("dialogue-options");
         conteudo.setPadding(new Insets(18));
+        HBox rodape=new HBox(12);rodape.getStyleClass().add("dialogue-footer");
         if(n.respostaLivre()) {
             TextField resposta=new TextField();resposta.setId("resposta-charada");resposta.setPromptText("Sua resposta");resposta.setAccessibleText("Resposta à charada");
             resposta.setTextFormatter(new TextFormatter<String>(c->c.getControlNewText().length()<=200?c:null));
@@ -401,9 +420,21 @@ public final class Aplicativo extends Application {
         }
         for(var escolha:n.escolhas()) {
             Button b=botao(escolha.nome(),"secondary",()->agir(new AcaoJogo(ESCOLHER_EVENTO,escolha.id())));b.setDisable(!escolha.disponivel());
-            VBox card=coluna(texto(escolha.descricao(),"muted"),b);card.getStyleClass().add("panel");conteudo.getChildren().add(card);
+            b.setWrapText(true);
+            if(n.saida()!=null && escolha.id()==n.saida()) {
+                b.setId("saida-narrativa");b.getStyleClass().remove("secondary");b.getStyleClass().add("primary");HBox.setHgrow(b,Priority.ALWAYS);rodape.getChildren().add(b);continue;
+            }
+            VBox card;
+            if(n.moradorId()!=null) {
+                TitledPane detalhes=new TitledPane("Objetivo e recompensa",texto(escolha.descricao(),"dialogue-detail"));detalhes.setExpanded(false);
+                card=new VBox(8,b,detalhes);
+            } else card=coluna(texto(escolha.descricao(),"dialogue-detail"),b);
+            card.getStyleClass().add("panel");conteudo.getChildren().add(card);
         }
-        return secoes(conteudo);
+        ScrollPane scroll=new ScrollPane(conteudo);scroll.setFitToWidth(true);scroll.setMinHeight(0);
+        BorderPane painel=new BorderPane(scroll);painel.setTop(cabecalho);
+        if(!rodape.getChildren().isEmpty())painel.setBottom(rodape);
+        return painel;
     }
     private void confirmarServico(String titulo,EstadoJogo.Opcao opcao,AcaoJogo acao) {
         Alert alerta=new Alert(Alert.AlertType.CONFIRMATION,opcao.descricao(),ButtonType.CANCEL,ButtonType.OK);
@@ -548,7 +579,12 @@ public final class Aplicativo extends Application {
             ()->{if(raiz.isDisabled())throw new IllegalStateException("Entrada não foi liberada.");rapido=true;snapshot("06-apos-ataque");janela.setWidth(1024);janela.setHeight(720);},
             ()->{snapshot("07-compacto");jogo=new MotorJogo("Arthur","Paladino",false,41L);historico.clear();pagina="Missões";renderizar();},
             ()->{snapshot("22-moradores");agir(new AcaoJogo(CONVERSAR,0));},
-            ()->{snapshot("23-dialogo");clicar("Aceitar: Praga na Floresta");},
+            ()->{snapshot("23-dialogo");
+                Node sair=raiz.lookup("#saida-narrativa");
+                if(sair==null || !(sair.getParent() instanceof HBox))throw new IllegalStateException("Saída não está no rodapé fixo.");
+                var limites=sair.localToScene(sair.getBoundsInLocal());
+                if(limites.getMinY()<0||limites.getMaxY()>janela.getScene().getHeight())throw new IllegalStateException("Saída fora da janela compacta.");
+                clicar("Aceitar: Praga na Floresta");},
             ()->{if(!jogo.estado().narrativa().texto().contains("Conto com você"))throw new IllegalStateException("Missão não foi aceita na conversa.");clicar("Encerrar conversa");snapshot("24-conversa-concluida");
                 // Dados de apresentação: regras e transição real de vitória são testadas em JUnit.
                 encerramento(new HistoriaCampanha.Encerramento(true,"Aurora verá outro amanhecer",

@@ -10,6 +10,8 @@ Consulte o [histórico de versões](CHANGELOG.md) e as
 [versões publicadas no GitHub](https://github.com/luigigiarola-dev/SuperRpgTerminal/releases).
 O [plano revisado e seu estado real](docs/PLANO_REVISADO.md) separa entregas funcionais,
 pendências de arquitetura e acabamento visual, mantendo a numeração das fases 0–6.
+O projeto agora pode evoluir além das regras do terminal, por decisão do autor:
+veja a [direção criativa e suas referências](docs/DIRECAO_CRIATIVA.md).
 
 Na próxima prévia (`2.0.0-alpha.7-SNAPSHOT`, código em desenvolvimento): prólogo,
 epílogos por honra, resumo, pontuação e ranking local por modo. Esses recursos ainda não estão

@@ -51,7 +51,8 @@ final class Aventuras {
     private Opcao escolha(int id,String nome,String desc,boolean pode) { return new Opcao(id,nome,desc,pode); }
     private void abrir(Tipo tipo,String titulo,String texto,Opcao... escolhas) {
         this.tipo=tipo;jogo.fase=Fase.EVENTO;
-        narrativa=new Narrativa(titulo,texto,List.of(escolhas),tipo==Tipo.CHARADA);
+        narrativa=new Narrativa(titulo,texto,List.of(escolhas),tipo==Tipo.CHARADA,
+            tipo==Tipo.MORADOR?morador.id():null,tipo==Tipo.MORADOR||tipo==Tipo.RESULTADO?0:null);
     }
     private void resultado(String titulo,String texto) {
         Eventos.texto(texto);
